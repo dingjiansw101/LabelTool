@@ -48,6 +48,7 @@
         <option value="rect">Rectangle</option>
         <option value="other">Dots</option>
         <option value="edit">Edit</option>
+        <option value="check">Check</option>
         </select>
         <input type="button" id="myBtn1" value="delete" onclic=""/>
         <input type="button" id="myBtn2" value="save" onclic=""/>
@@ -84,9 +85,19 @@ if(window.addEventListener) {
   
   var txtRoot=textRoot+'labelTxt/';
   var canvas, context, canvaso, contexto;
+
+  //dot size
+  dot_size = 5;
+
+  //line size
+  line_size = 2;
+
+  // the content need to check
+  var dataDic = {'0A': 'passenger plane', '0B':'fighter aeroplane', '0C': 'radar warning aircraft', '1':'baseball diamond', '2':'bridge', '3':'ground track field', '4A':'car', '4B':'truck', '4C':'bus', '5A':'ship', '5B':'warship', '6':'tennis court', '7':'Basketball court','7B':'half basketball', '8':'storage tank','9':'soccer ball field','10':'Turntable', '11':'harbor', '12':'electric pole', '13':'parking lot', '14':'swimming pool', '15':'lake', '16':'helicopter','17':'airport', '18A':'viaduct', '18B':'18B', '18C':'18C', '18D':'18D', '18E':'18E', '18F':'18F', '18G':'18G', '18H':'18H', '18I':'18I', '18J':'18J', '18K':'18K', '18L':'18L', '18M':'18M', '18N':'18N', '4A_area':'4A_area', '4B_area':'4B_area', '5A_area':'5A_area', '8_area':'8_area', '13_area':'13_area'};
+
   
   // The active tool instance.
-  var j=0,textState=false,saveState=false,editState=false,editSaveState=false,is_onlyOne=false;
+  var j=0,textState=false,saveState=false,editState=false,editSaveState=false,is_onlyOne=false,ifCheck=false;
   var tool,Id_size=1,origin_index;
   var tool_default = 'rect';
   var arry=new Array()
@@ -181,8 +192,8 @@ if(window.addEventListener) {
       var image = document.createElement("img");
       image.src = "images/" + filenames[0];
       var idx = filenames[0].lastIndexOf(".");
+      //var writerPath =txtRoot+filenames[j].substring(0,index)+'.txt';      
       path=txtRoot+filenames[0].substring(0,idx)+'.txt';
-      //path=txtRoot+filenames[0].substring(0,filenames[0].length-4)+'.txt';
       //alert(path);
     
 		  image.onload=function()
@@ -298,6 +309,8 @@ if(window.addEventListener) {
     var tool = this;
     this.started = false;
     editState=false;
+    ifCheck=false;
+    context.clearRect(0,0,canvas.width,canvas.height);
     document.getElementById("inputTextToSave").value='';
 
     // This is called when you start holding down the mouse button.
@@ -314,7 +327,7 @@ if(window.addEventListener) {
 
         context.fillStyle="#FF0000";
         context.beginPath();
-        context.arc(ev._x, ev._y,3,0,2*Math.PI,true);
+        context.arc(ev._x, ev._y,dot_size,0,2*Math.PI,true);
         context.fill();
         //alert('x:'+arry[6]+',y:'+arry[7]);
         //alert("count"+count);
@@ -340,13 +353,13 @@ if(window.addEventListener) {
              //alert('hello');
 
            }
-            context.lineWidth = 2; 
+            context.lineWidth = line_size; 
             context.closePath();
             context.stroke();  
 
             context.fillStyle="yellow";
             context.beginPath();
-            context.arc(arry[0], arry[1],3,0,2*Math.PI,true);
+            context.arc(arry[0], arry[1],dot_size,0,2*Math.PI,true);
             context.fill();
         
           count=0;
@@ -381,6 +394,8 @@ if(window.addEventListener) {
     var tool = this;
     this.started = false;
     editState=false;
+    ifCheck=false;
+    context.clearRect(0,0,canvas.width,canvas.height);
     document.getElementById("inputTextToSave").value='';
 
     this.mousedown = function (ev) {
@@ -405,12 +420,12 @@ if(window.addEventListener) {
         return;
       }
       context.strokeStyle = "#FF0000";
-      context.lineWidth = 2;
+      context.lineWidth = line_size;
       context.strokeRect(x, y, w, h);
 
       context.fillStyle="yellow";
       context.beginPath();
-      context.arc(x, y,3,0,2*Math.PI,true);
+      context.arc(x, y,dot_size,0,2*Math.PI,true);
       context.fill();
     };
 
@@ -424,40 +439,41 @@ if(window.addEventListener) {
     Sumcount=4;
     };
 
+    tools.check=function(){
+    var tool = this;
+    this.started = false;
+    editState=false;
+    ifCheck = true;
+    readTxt(Id_size);
+    //whenCheck();
+  };
 
-    function getLineFunction(x1,y1,x2,y2)
+  function whenCheck(){
+    document.getElementById("inputTextToSave").value='';
+
+    context.clearRect(0,0,canvas.width,canvas.height);
+    //context_bg.clearRect(0,0,canvas.width,canvas.height);
+
+    var len = polygons.length;
+    //alert('len:'+lepolygonn)
+    for (var k=0; k<len; k++)
     {
-      var a,b,c;
-      if(x1==x2)
-      {
-         a=1;
-         b=0;
-         c=-x1;
-      }
-      else if(y1==y2)
-      {
-        a=0;
-        b=1;
-        c=-y1;
-      }
-      else
-      {
-        a=y1-y2;
-        b=-(x1-x2);
-        c=x1*y2-x2*y1;
-      }
-      //alert('x2,y2:',x2,y2);
-      return [a,b,c];
-    }
+     drawUppercanvas(polygons[k],'#00FF00');
+     //alert('after draw' );
+     context.fillStyle="yellow";
+     context.beginPath();
+     context.arc(polygons[k][0], polygons[k][1],dot_size,0,2*Math.PI,true);
+     context.fill();
+     var label = box_content[k].split(' ');
+     //alert('label'+label)
+     label = label[0];
 
-
-    function indexOfSmallest(a) {
-       var lowest = 0;
-       for (var i = 1; i < a.length; i++) {
-        if (a[i] < a[lowest]) lowest = i;
-       }
-       return lowest;
+     context.font = "20px serif";
+     context.fillStyle = 'red';
+     //alert(dataDic[label]);
+     context.fillText(dataDic[label],polygons[k][0]-5,polygons[k][1]-5);
     }
+  }
 
     
     tools.edit=function () {
@@ -465,6 +481,7 @@ if(window.addEventListener) {
     //editState=true;
     var tool = this;
     this.started = true;
+    ifCheck=false;
     //var len = polygons.length;
     var dots = new Array();
     var record_content = new Array();
@@ -495,12 +512,12 @@ if(window.addEventListener) {
       for (var j=0; j<len; j++)
       {  
         
-        dots[0] = polygons[j][0]; dots[1] = polygons[j][1];
-        //alert('polygons edit:'+ polygons[0][0]);
-        // alert('dots edit:'+ dots[0]);
-        dots[2] = polygons[j][2]; dots[3] = polygons[j][3];
-        dots[4] = polygons[j][4]; dots[5] = polygons[j][5];
-        dots[6] = polygons[j][6]; dots[7] = polygons[j][7];
+        for (var p=0, q=0; p<(polygons[j].length/2); p++, q++)
+        {
+          dots[p+q] = polygons[j][(p+q)];
+          dots[p+q+1] = polygons[j][(p+q+1)];
+        }
+
 
         for (var m=0,n=0; m<4; m++,n++)
         {   
@@ -524,7 +541,7 @@ if(window.addEventListener) {
          // if(j==14)
          // {alert(dis);}
 
-          if (dis<1.5)
+          if (dis<3)
           {  
             //alert('here');
             whether_draw =true;
@@ -565,7 +582,7 @@ if(window.addEventListener) {
               y_min = y1<y2?y1:y2
 
               //alert((x>= x_min && x<=x_max))
-              if ((x>= x_min-1.5 && x<=x_max+1.5)&&(y>= y_min-1.5 && y<=y_max+1.5))
+              if ((x>= x_min-3 && x<=x_max+3)&&(y>= y_min-3 && y<=y_max+3))
               {
                 whether_draw = true;
               }
@@ -631,7 +648,12 @@ if(window.addEventListener) {
               //alert('new_dots[0]:'+new_dots[0]);             
             for(var p=0;p<count_newDots;p++)
             {
-              text +=Math.round(new_dots[p][0]/Id_size).toString()+' '+Math.round(new_dots[p][1]/Id_size).toString()+' '+Math.round(new_dots[p][2]/Id_size).toString()+' '+Math.round(new_dots[p][3]/Id_size).toString()+' '+ Math.round(new_dots[p][4]/Id_size).toString()+' '+Math.round(new_dots[p][5]/Id_size).toString()+' '+Math.round(new_dots[p][6]/Id_size).toString()+' '+Math.round(new_dots[p][7]/Id_size).toString()+' '+new_content[p]+'\n';
+              for (var tmp=0; tmp<new_dots[p].length; tmp++)
+              {
+                text +=Math.round(new_dots[p][tmp]/Id_size).toString()+' ';
+              }
+
+              text = text+new_content[p]+'\n';
             }
 
           }
@@ -660,8 +682,13 @@ if(window.addEventListener) {
               //alert('new_dots[0]:'+new_dots[0]);             
             for(var p=0;p<count_newDots;p++)
             {
-              text +=Math.round(new_dots[p][0]/Id_size).toString()+' '+Math.round(new_dots[p][1]/Id_size).toString()+' '+Math.round(new_dots[p][2]/Id_size).toString()+' '+Math.round(new_dots[p][3]/Id_size).toString()+' '+ Math.round(new_dots[p][4]/Id_size).toString()+' '+Math.round(new_dots[p][5]/Id_size).toString()+' '+Math.round(new_dots[p][6]/Id_size).toString()+' '+Math.round(new_dots[p][7]/Id_size).toString()+' '+new_content[p]+'\n';
+              for (var tmp=0; tmp<new_dots[p].length; tmp++)
+              {
+                text +=Math.round(new_dots[p][tmp]/Id_size).toString()+' ';
+              }
+              text = text+new_content[p]+'\n';
             }
+            
             record_index=[];
             record_index[0]=origin_index;
             count_index=1;
@@ -724,7 +751,11 @@ if(window.addEventListener) {
                                
                   for(var p=0;p<count_newDots;p++)
                   {
-                    text +=Math.round(new_dots[p][0]/Id_size).toString()+' '+Math.round(new_dots[p][1]/Id_size).toString()+' '+Math.round(new_dots[p][2]/Id_size).toString()+' '+Math.round(new_dots[p][3]/Id_size).toString()+' '+ Math.round(new_dots[p][4]/Id_size).toString()+' '+Math.round(new_dots[p][5]/Id_size).toString()+' '+Math.round(new_dots[p][6]/Id_size).toString()+' '+Math.round(new_dots[p][7]/Id_size).toString()+' '+new_content[p]+'\n';
+                    for (var tmp=0; tmp<new_dots[p].length; tmp++)
+                    {
+                      text +=Math.round(new_dots[p][tmp]/Id_size).toString()+' ';
+                    }
+                    text = text+new_content[p]+'\n';
                   }
                   record_index=[];
                   record_index[0]=origin_index;
@@ -740,6 +771,39 @@ if(window.addEventListener) {
   }
 //}
 
+    function getLineFunction(x1,y1,x2,y2)
+    {
+      var a,b,c;
+      if(x1==x2)
+      {
+         a=1;
+         b=0;
+         c=-x1;
+      }
+      else if(y1==y2)
+      {
+        a=0;
+        b=1;
+        c=-y1;
+      }
+      else
+      {
+        a=y1-y2;
+        b=-(x1-x2);
+        c=x1*y2-x2*y1;
+      }
+      //alert('x2,y2:',x2,y2);
+      return [a,b,c];
+    }
+
+
+    function indexOfSmallest(a) {
+       var lowest = 0;
+       for (var i = 1; i < a.length; i++) {
+        if (a[i] < a[lowest]) lowest = i;
+       }
+       return lowest;
+    }
 
   //find duplicated number
    function is_dupilcate(arr) 
@@ -768,10 +832,10 @@ if(window.addEventListener) {
 
   //function edit()
 
-   function drawPolygon(arry) {
+   function drawPolygon(arry,color) {
     // body...
       context_bg.beginPath();
-      context_bg.strokeStyle = "#FF0000";
+      context_bg.strokeStyle = color||"#FF0000";
       context_bg.moveTo(arry[0],arry[1]);//起始点 
 
       for(var i=0,j=0;i<4;i++,j++)  
@@ -783,21 +847,21 @@ if(window.addEventListener) {
        //alert('hello');
 
      }
-      context_bg.lineWidth = 2; 
+      context_bg.lineWidth = line_size; 
       context_bg.closePath();
       context_bg.stroke();  
 
       context_bg.fillStyle="yellow";
       context_bg.beginPath();
-      context_bg.arc(arry[0], arry[1],3,0,2*Math.PI,true);
+      context_bg.arc(arry[0], arry[1],dot_size,0,2*Math.PI,true);
       context_bg.fill();
   }
 
 
-  function drawUppercanvas(arry){
+  function drawUppercanvas(arry,color){
     context.beginPath();
-    context.strokeStyle = "blue";
-    context_bg.moveTo(arry[0],arry[1]);//起始点
+    context.strokeStyle = color||"blue";
+    context.moveTo(arry[0],arry[1]);//起始点
 
     for(var i=0,j=0;i<4;i++,j++)  
    {
@@ -807,7 +871,7 @@ if(window.addEventListener) {
      //context.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
      //alert('hello');
    }
-     context.lineWidth = 2; 
+     context.lineWidth = line_size; 
      context.closePath();
      context.stroke();  
 
@@ -826,9 +890,11 @@ if(window.addEventListener) {
      box_content=[];
      record_index=[];
 
+     //alert('readTxt:'+path);
+      //alert('first_polygon:'+polygons.length)
      if(fso.FileExists(path))
     {
-
+      
       ts = fso.OpenTextFile(path, ForReading,false,-1);
       while (!ts.AtEndOfStream){
       s = ts.ReadLine();
@@ -849,6 +915,10 @@ if(window.addEventListener) {
 
       mydot=[];
     }
+      if(ifCheck){
+        whenCheck();
+      }
+    //alert('polygons:'+polygons.length);
   }
 
   }
@@ -869,7 +939,10 @@ if(window.addEventListener) {
     }
    document.getElementById("inputTextToSave").value = "";
    context.clearRect(0, 0, canvas.width, canvas.height);
-   arry=[];    
+   arry=[];
+   count=0;
+   n=0;
+   Sumcount=0;  
   }
 
 
@@ -893,7 +966,7 @@ if(window.addEventListener) {
     is_onlyOne=false;
     //alert("length:"+arry.length)
     //alert(arry);
-     if((arry[0]!==undefined)&&(Sumcount%4==0)&&((Math.abs(arry[0]-arry[2])>1.5)||(Math.abs(arry[1]-arry[3])>1.5)))
+     if((arry[0]!==undefined)&&(Sumcount%4==0)&&((Math.abs(arry[0]-arry[2])>3)||(Math.abs(arry[1]-arry[3])>3)))
      {
        //alert(Math.abs(arry[0]-arry[2]))
        for (var i = 0; i <8; i++)
@@ -913,7 +986,7 @@ if(window.addEventListener) {
     //Id_size=1;
     writeTxt(text);
    }
-    else{alert('error!');alert(arry);}
+    else{alert('error!');}
     document.getElementById("inputTextToSave").value = "";
    }
    else if(editSaveState&&origin_index!=undefined)
@@ -924,7 +997,12 @@ if(window.addEventListener) {
 
       for(var p=0;p<polygons.length;p++)
       {
-        rewrite_text +=Math.round(polygons[p][0]/Id_size).toString()+' '+Math.round(polygons[p][1]/Id_size).toString()+' '+Math.round(polygons[p][2]/Id_size).toString()+' '+Math.round(polygons[p][3]/Id_size).toString()+' '+Math.round( polygons[p][4]/Id_size).toString()+' '+Math.round(polygons[p][5]/Id_size).toString()+' '+Math.round(polygons[p][6]/Id_size).toString()+' '+Math.round(polygons[p][7]/Id_size).toString()+' '+box_content[p]+'\n';
+        for (var tmp=0; tmp<polygons[p].length; tmp++)
+        {
+          rewrite_text +=Math.round(polygons[p][tmp]/Id_size).toString()+' ';
+        }
+
+        rewrite_text = rewrite_text+box_content[p]+'\n';
 
       }
       //alert('savetext:'+rewrite_text);
@@ -950,8 +1028,8 @@ if(window.addEventListener) {
     var fso = new ActiveXObject("Scripting.FileSystemObject");
     var index = filenames[j].lastIndexOf(".");
     var writerPath =txtRoot+filenames[j].substring(0,index)+'.txt';
+    //var writerPath =txtRoot+filenames[j].substring(0,filenames[j].length-4)+'.txt';
     //var writerPath =txtRoot+(filenames[j].split('.'))[0]+'.txt';
-
     var f = fso.createtextfile(writerPath,2,true);
     f.write(text);
     text = [];
@@ -1005,10 +1083,11 @@ if(window.addEventListener) {
         canvas_bg.width = canvaso.width;
         canvas_bg.height= canvaso.height; 
         contexto.drawImage(image,0,0,image.width,image.height);
-        var index = filenames[j].lastIndexOf(".");
+        var index = filenames[j].lastIndexOf("."); 
         path=txtRoot+filenames[j].substring(0,index)+'.txt';
-        //path=txtRoot+filenames[j].substring(0,filenames[j].length-4)+'.txt';
+        //alert('loadTxt:'+path)
         readTxt(Id_size);
+        //alert(polygons.length);
     }
   }
 
@@ -1047,6 +1126,7 @@ if(window.addEventListener) {
 
    function later_picture(){
 
+    //alert('ifCheck2:'+ifCheck);
     if((textState)&&(saveState))
         {
          saveState=false;
@@ -1056,17 +1136,27 @@ if(window.addEventListener) {
 
        j++;
        //var is_pic=filenames[j].substring(filenames[j].length-3);
+        //alert('j:'+j)       
+
        load_picture();
        document.getElementById("inputTextToSave").value = "";
        document.getElementById("num_pic").value=j;
+
+
       }
       else
        {
         alert('This is the last picture!');
+        if(ifCheck==true)
+        {
+           whenCheck();
+        }
        }
   }
 
    function pre_picture(){
+      
+     //alert('ifCheck:'+ifCheck)
      if((textState)&&(saveState))
        {
         saveState=false;
@@ -1075,13 +1165,22 @@ if(window.addEventListener) {
       if(j==0)
        {
         alert('This is the first picture!');
+        if(ifCheck==true)
+        {
+          whenCheck();
+        }
        }
       else{
         j--;
+        //alert('1:'+polygons.length);
         load_picture();
+        //alert('2:'+polygons.length);
         document.getElementById("inputTextToSave").value = "";
         document.getElementById("num_pic").value=j;
-        }
+        //context.clearRect(0,0,canvas.width,canvas.height);
+      }
+
+
   }
   init();
 
