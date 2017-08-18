@@ -93,8 +93,8 @@ if(window.addEventListener) {
   line_size = 2;
 
   // the content need to check
-  var dataDic = {'0A': 'passenger plane', '0B':'fighter aeroplane', '0C': 'radar warning aircraft', '1':'baseball diamond', '2':'bridge', '3':'ground track field', '4A':'car', '4B':'truck', '4C':'bus', '5A':'ship', '5B':'warship', '6':'tennis court', '7':'Basketball court','7B':'half basketball', '8':'storage tank','9':'soccer ball field','10':'Turntable', '11':'harbor', '12':'electric pole', '13':'parking lot', '14':'swimming pool', '15':'lake', '16':'helicopter','17':'airport', '18A':'viaduct', '18B':'18B', '18C':'18C', '18D':'18D', '18E':'18E', '18F':'18F', '18G':'18G', '18H':'18H', '18I':'18I', '18J':'18J', '18K':'18K', '18L':'18L', '18M':'18M', '18N':'18N', '4A_area':'4A_area', '4B_area':'4B_area', '5A_area':'5A_area', '8_area':'8_area', '13_area':'13_area'};
-
+  var dataDic = {'0A': 'passenger plane', '0B':'fighter aeroplane', '0C': 'radar warning aircraft', '1':'baseball diamond', '2':'bridge', '3':'ground track field', '4A':'car', '4B':'truck', '4C':'bus', '5A':'ship', '5B':'warship', '6':'tennis court', '7':'Basketball court','7B':'half basketball', '8':'storage tank','9':'soccer ball field','10':'Turntable', '11':'harbor', '12':'electric pole', '13':'parking lot', '14':'swimming pool', '15':'lake', '16':'helicopter','17':'airport', '18A':'viaduct', '18B':'18B', '18C':'18C', '18D':'18D', '18E':'18E', '18F':'18F', '18G':'18G', '18H':'18H', '18I':'18I', '18J':'18J', '18K':'18K', '18L':'18L', '18M':'18M', '18N':'18N', '4A_area':'4A_area', '4B_area':'4B_area', '5A_area':'5A_area', '8_area':'8_area', '13_area':'13_area', 'bridge':'bridge', 'plane':'plane', 'ship':'ship', 'storage':'storage', 'harbor':'harbor'};
+  var colordic = {'0A': '#F0F8FF', '0B':'#F0F8FF', '0C': '#F0F8FF', '1':'#FAEBD7', '2':'#00FFFF', '3':'#7FFFD4', '4A':'#000080', '4B':'#000080', '4C':'#000080', '5A':'#A52A2A', '5B':'#A52A2A', '6':'#8A2BE2', '7':'#DEB887','7B':'#DEB887', '8':'#5F9EA0','9':'#7FFF00','10':'#D2691E', '11':'#FF7F50', '12':'#6495ED', '13':'#FF1493', '14':'#DC143C', '15':'#00FFFF', '16':'#00008B','17':'#008B8B', '18A':'#B8860B', '18B':'#B8860B', '18C':'#B8860B', '18D':'#B8860B', '18E':'#B8860B', '18F':'#B8860B', '18G':'#B8860B', '18H':'#B8860B', '18I':'#B8860B', '18J':'#B8860B', '18K':'#B8860B', '18L':'#B8860B', '18M':'#B8860B', '18N':'#B8860B'}
   
   // The active tool instance.
   var j=0,textState=false,saveState=false,editState=false,editSaveState=false,is_onlyOne=false,ifCheck=false;
@@ -458,15 +458,17 @@ if(window.addEventListener) {
     //alert('len:'+lepolygonn)
     for (var k=0; k<len; k++)
     {
-     drawUppercanvas(polygons[k],'#00FF00');
+     var label = box_content[k].split(' ');
+     //alert('label'+label)
+     label = label[0];
+     //drawUppercanvas(polygons[k],'#F0F8FF');
+     drawUppercanvas(polygons[k], colordic[label])
      //alert('after draw' );
      context.fillStyle="yellow";
      context.beginPath();
      context.arc(polygons[k][0], polygons[k][1],dot_size,0,2*Math.PI,true);
      context.fill();
-     var label = box_content[k].split(' ');
-     //alert('label'+label)
-     label = label[0];
+
 
      context.font = "20px serif";
      context.fillStyle = 'red';
@@ -909,7 +911,7 @@ if(window.addEventListener) {
         mydot[ii]=parseInt(m[ii])*resize_val;     
       }
 
-      drawPolygon(mydot);
+      drawPolygon(mydot, '#F0F8FF');
       polygons[n]=mydot;
       n=n+1;
 
