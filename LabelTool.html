@@ -911,7 +911,8 @@ if(window.addEventListener) {
         mydot[ii]=parseInt(m[ii])*resize_val;     
       }
 
-      drawPolygon(mydot, '#F0F8FF');
+      editlabel = l[8]
+      drawPolygon(mydot, colordic[editlabel]);
       polygons[n]=mydot;
       n=n+1;
 
