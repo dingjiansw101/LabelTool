@@ -112,6 +112,11 @@ if(window.addEventListener) {
   var text=[];
   //alert(text);
 
+  var flag_save = true
+  var tmp_poly = new Array();
+  var select_point = -1;
+
+
   var path,content;
 
   var textToSaveAsBlob = new Blob();
@@ -245,7 +250,6 @@ if(window.addEventListener) {
       return;
     }
     tool_select.addEventListener('change', ev_tool_change, false);
-
     // Activate the default tool.
     if (tools[tool_default]) {
       tool = new tools[tool_default]();
@@ -257,12 +261,20 @@ if(window.addEventListener) {
     canvas.addEventListener('mousemove', ev_canvas, false);
     canvas.addEventListener('mouseup',   ev_canvas, false);
     canvas.addEventListener('click',   ev_canvas, false);
+    canvas.addEventListener("mouseup", endchange)
+
     x.addEventListener("click", delet);
     y.addEventListener("click", save);
     after.addEventListener("click", later_picture);
     pre.addEventListener("click", pre_picture);
     resize.addEventListener("click",pic_resize);
   }
+
+  function endchange () {
+    selectpoint = -1;
+    //alert(selectpoint)
+  }
+
 
   // The general-purpose event handler. This function just determines the mouse 
   // position relative to the canvas element.
@@ -312,13 +324,21 @@ if(window.addEventListener) {
     ifCheck=false;
     context.clearRect(0,0,canvas.width,canvas.height);
     document.getElementById("inputTextToSave").value='';
-
+    
+    
+    
+    flag_save = true
     // This is called when you start holding down the mouse button.
     // This starts the pencil drawing.
     this.click = function (ev) {
-        
-        arry[count+n]=ev._x;
+      
+        if (flag_save) {
+          arry[count+n]=ev._x;
         arry[count+n+1]=ev._y;
+
+        //tmp_poly
+        tmp_poly[count+n]=ev._x;
+        tmp_poly[count+n+1]=ev._y;
        // alert('ev._x:'+ev._x+'ev._y:'+ev._y);
         Sumcount++;
         count++;
@@ -353,18 +373,18 @@ if(window.addEventListener) {
              //alert('hello');
 
            }
-            context.lineWidth = line_size; 
-            context.closePath();
-            context.stroke();  
+          context.lineWidth = line_size; 
+          context.closePath();
+          context.stroke();  
 
-            context.fillStyle="yellow";
-            context.beginPath();
-            context.arc(arry[0], arry[1],Math.min(dot_size*Id_size, dot_size),0,2*Math.PI,true);
-            context.fill();
-        
+          context.fillStyle="yellow";
+          context.beginPath();
+          context.arc(arry[0], arry[1],Math.min(dot_size*Id_size, dot_size),0,2*Math.PI,true); 
+          context.fill();
+          
+          flag_save = false;
           count=0;
           n=0;
-        //tool.started = true;
         }
 
         else if((count==4)&&(arry[0]==undefined))
@@ -375,7 +395,62 @@ if(window.addEventListener) {
         }
         
         tool.started = true;
+
+        }
     };
+
+
+    // add drag the point
+    this.mousedown = function(ev){
+      // only allow adjust the poly before save
+      select_point = -1;
+      if (!flag_save) {
+        var mousedown_x = ev._x; 
+        var mousedown_y = ev._y;
+        
+        for (var i = 0; i < 4; i++) {
+          var dis = Math.sqrt( Math.pow(arry[2*i] - mousedown_x, 2) + Math.pow(arry[2*i+1] - mousedown_y, 2) );
+          if (dis < 5) {
+            select_point = i;
+            break;
+          }
+        }
+      }
+    }
+    this.mousemove = function (ev) {
+      
+      if (select_point != -1) {
+        arry[2*select_point] = ev._x
+        arry[2*select_point + 1] = ev._y
+      }
+      context.clearRect(0, 0, canvas.width, canvas.height); 
+
+          //context.strokeStyle = "#FF0000";
+            //drawUppercanvas(arry);
+      context.beginPath();
+      context.strokeStyle = "red";
+      context.moveTo(arry[0], arry[1]);//起始点  
+
+      for (var i = 0, j = 0; i < 4; i++ , j++) {
+        context.lineTo(arry[(i + j) % 8], arry[(i + j + 1) % 8]);//起始点
+      }
+      context.lineWidth = line_size;
+      context.closePath();
+      context.stroke();
+
+      context.fillStyle = "yellow";
+      context.beginPath();
+      context.arc(arry[0], arry[1], Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+      context.fill();
+
+    }
+
+   // this.mouseup = function (ev) {
+     // select_point = -1
+      //alert(selectpoint)
+    //}
+
+
 
 
     // This is called when you release the mouse button.
@@ -385,11 +460,12 @@ if(window.addEventListener) {
         tool.started = false;
         //img_update();
       }
+      select_point = -1
     };
   };
 
   // The rectangle tool.
-    tools.rect = function () {
+  tools.rect = function () {
     
     var tool = this;
     this.started = false;
@@ -435,11 +511,11 @@ if(window.addEventListener) {
         tool.started = false;
         //img_update();
        }
-      };
-    Sumcount=4;
     };
+    Sumcount=4;
+  };
 
-    tools.check=function(){
+  tools.check=function(){
     var tool = this;
     this.started = false;
     editState=false;
@@ -478,7 +554,7 @@ if(window.addEventListener) {
   }
 
     
-    tools.edit=function () {
+  tools.edit=function () {
 
     //editState=true;
     var tool = this;
@@ -773,8 +849,8 @@ if(window.addEventListener) {
   }
 //}
 
-    function getLineFunction(x1,y1,x2,y2)
-    {
+  function getLineFunction(x1,y1,x2,y2)
+  {
       var a,b,c;
       if(x1==x2)
       {
@@ -796,20 +872,20 @@ if(window.addEventListener) {
       }
       //alert('x2,y2:',x2,y2);
       return [a,b,c];
-    }
+  }
 
 
-    function indexOfSmallest(a) {
+  function indexOfSmallest(a) {
        var lowest = 0;
        for (var i = 1; i < a.length; i++) {
         if (a[i] < a[lowest]) lowest = i;
        }
        return lowest;
-    }
+  }
 
   //find duplicated number
-   function is_dupilcate(arr) 
-   {
+  function is_dupilcate(arr) 
+  {
        //    body...
         var sorted_arr = arr.slice().sort();
         var results = [];
@@ -895,34 +971,34 @@ if(window.addEventListener) {
      //alert('readTxt:'+path);
       //alert('first_polygon:'+polygons.length)
      if(fso.FileExists(path))
-    {
+     {
       
       ts = fso.OpenTextFile(path, ForReading,false,-1);
       while (!ts.AtEndOfStream){
-      s = ts.ReadLine();
-      l=s.split(' ');
-      m=l.slice(0,8);
+        s = ts.ReadLine();
+        l=s.split(' ');
+        m=l.slice(0,8);
 
-      var content=l.slice(8,l.length);
-      box_content[n]=content.join(' ');
+        var content=l.slice(8,l.length);
+        box_content[n]=content.join(' ');
 
-      for(var ii=0; ii<8; ii++)
-      {
-        mydot[ii]=parseInt(m[ii])*resize_val;     
+        for(var ii=0; ii<8; ii++)
+        {
+          mydot[ii]=parseInt(m[ii])*resize_val;     
+        }
+
+        editlabel = l[8]
+        drawPolygon(mydot, colordic[editlabel]);
+        polygons[n]=mydot;
+        n=n+1;
+
+        mydot=[];
       }
-
-      editlabel = l[8]
-      drawPolygon(mydot, colordic[editlabel]);
-      polygons[n]=mydot;
-      n=n+1;
-
-      mydot=[];
-    }
       if(ifCheck){
         whenCheck();
       }
     //alert('polygons:'+polygons.length);
-  }
+   }
 
   }
 
@@ -1015,6 +1091,7 @@ if(window.addEventListener) {
       origin_index=undefined;
    }
 
+   flag_save = true;
   }
 
    function saveTextAsFile()
