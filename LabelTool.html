@@ -43,6 +43,11 @@
     <div id='DrawingTool' style="position:relative; left:400px;top:-60px">
         Total_Num:
         <input readonly="readonly" type="text" id="Total_Num" size="5" style="left:0px;top:0px"/>
+
+        <!--lastlabel-->
+        LastLabel:
+        <input readonly="readonly" type="text" id="LastLabel" size="5" style="left:0px;top:0px"/>
+
         Drawing tool:
         <select id="dtool">
         <option value="rect">Rectangle</option>
@@ -61,6 +66,8 @@
         <textarea id="inputTextToSave" cols="50" rows="2"></textarea><br>
         
     </div>
+
+
 
     <div id='content' style="position:relative; left:200px;top:-80px">
         <input type="button" id="pic_resize" value="resize" onclic=""/>
@@ -112,6 +119,7 @@ if(window.addEventListener) {
   var text=[];
   //alert(text);
 
+  //when use dots, count == 4, the flag_save become false, when save, the flag_save = true
   var flag_save = true
   var tmp_poly = new Array();
   var select_point = -1;
@@ -152,7 +160,18 @@ if(window.addEventListener) {
 	   alert('please input a correct number!');
 	   break;
 	   default:
-      }
+     }
+     if (event.keyCode == '86') {
+
+       if ((document.getElementById("dtool").value== "other") && (flag_save == false)) {
+         document.getElementById("inputTextToSave").value = document.getElementById("LastLabel").value;
+         save();
+       } else if (document.getElementById("dtool").value== "rect") {
+         document.getElementById("inputTextToSave").value = document.getElementById("LastLabel").value;
+         save();
+       }
+     }
+
     });
 
     if (!canvaso) {
@@ -1022,6 +1041,7 @@ if(window.addEventListener) {
    count=0;
    n=0;
    Sumcount=0;  
+   flag_save = true;
   }
 
 
@@ -1066,6 +1086,7 @@ if(window.addEventListener) {
     writeTxt(text);
    }
     else{alert('error!');}
+    document.getElementById("LastLabel").value = document.getElementById("inputTextToSave").value;
     document.getElementById("inputTextToSave").value = "";
    }
    else if(editSaveState&&origin_index!=undefined)
@@ -1085,6 +1106,7 @@ if(window.addEventListener) {
 
       }
       //alert('savetext:'+rewrite_text);
+      document.getElementById("LastLabel").value = document.getElementById("inputTextToSave").value;
       document.getElementById("inputTextToSave").value='';
       writeTxt(rewrite_text);
       editSaveState=false;
@@ -1232,6 +1254,7 @@ if(window.addEventListener) {
            whenCheck();
         }
        }
+       flag_save = true;
   }
 
    function pre_picture(){
@@ -1260,7 +1283,7 @@ if(window.addEventListener) {
         //context.clearRect(0,0,canvas.width,canvas.height);
       }
 
-
+      flag_save = true;
   }
   init();
 
