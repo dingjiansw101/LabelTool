@@ -1,1192 +1,1318 @@
 <!DOCTYPE html>
 <html>
-<head>
-   <title>标图工具</title>
-   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-   <script type="text/javascript" src='FileSaver.js'></script>
-   <script type="text/javascript" src='jquery.js'></script>
-   <script type="text/javascript" src='browseFolder.js'></script>
-   <style type="text/css">
-      #container { position: relative;text-align: center; top:100px ;}
-      #imageView { border: 1px solid #000; }
-      #imageTemp { position: absolute; top: 0; left: 0; right:0;border: 1px solid #000; margin-left:auto;margin-right:auto;}
-      #myCanvas_bg {position: absolute; top: 0; left: 0; right:0;border: 1px solid #000; margin-left:auto;margin-right:auto;}
-      #navbar { 
-                 position:fixed;
-                 top: 0;
-                 margin:auto;
-                 left: 0;
-                 right: 0;
-                 width: 100%;
-                 height: 90px;
-                 z-index: 99999;  
-              }
 
+<head>
+  <title>标图工具</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" src='FileSaver.js'></script>
+  <script type="text/javascript" src='jquery.js'></script>
+  <script type="text/javascript" src='browseFolder.js'></script>
+  <style type="text/css">
+    #container {
+      position: relative;
+      text-align: center;
+      top: 100px;
+    }
+
+    #imageView {
+      border: 1px solid #000;
+    }
+
+    #imageTemp {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      border: 1px solid #000;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #myCanvas_bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      border: 1px solid #000;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #navbar {
+      position: fixed;
+      top: 0;
+      margin: auto;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 90px;
+      z-index: 99999;
+    }
   </style>
 
-      <script type="text/javascript">
-      function mlString(f) {
+  <script type="text/javascript">
+    function mlString(f) {
       return f.toString().
-      replace(/^[^\/]+\/\*!?/, '').    //regular expression
-      replace(/\*\/[^\/]+$/, '');      //regular expression
-  }
+        replace(/^[^\/]+\/\*!?/, '').    //regular expression
+        replace(/\*\/[^\/]+$/, '');      //regular expression
+    }
   </script>
   <script type="text/javascript" src="folder_contents.js"></script>
 
-  </head>
+</head>
 
 <body>
-<nav class="navbar navbar-default navbar-fixed-top" id="navbar" style="background: #96b97d;">
-    <div class="navbar-header logo"><h1>
-      <a class="navbar-brand" target="_blank" style="color: #fff;">LabelTool</a></h1>
+  <nav class="navbar navbar-default navbar-fixed-top" id="navbar" style="background: #96b97d;">
+    <div class="navbar-header logo">
+      <h1>
+        <a class="navbar-brand" target="_blank" style="color: #fff;">LabelTool</a></h1>
     </div>
-    <div id='DrawingTool' style="position:relative; left:400px;top:-60px">
-        Total_Num:
-        <input readonly="readonly" type="text" id="Total_Num" size="5" style="left:0px;top:0px"/>
-        Drawing tool:
-        <select id="dtool">
+    <div id='DrawingTool' style="position:relative; left:200px;top:-60px">
+      current :
+      <input readonly="readonly" type="text" id="annotated" size="5" style="left:0px;top:0px"/>
+      total anno:
+      <input readonly="readonly" type="text" id="totalannotated" size="5" style="left:0px;top:0px"/>
+      <input type="button" id="countinstance" value="countinstance" onclic=""/>
+      name:
+      <input readonly="readonly" type="text" id="CurrentName" size="20" style="left:0px;top:0px" /> 
+<!--       
+      resolution:
+      <input readonly="readonly" type="text" id="resolution" size="5" style="left:0px;top:0px" /> -->
+
+      Total_Num:
+      <input readonly="readonly" type="text" id="Total_Num" size="5" style="left:0px;top:0px" />
+
+      <!--lastlabel-->
+      LastLabel:
+      <input readonly="readonly" type="text" id="LastLabel" size="5" style="left:0px;top:0px" /> 
+
+      <input type="button" id="mark" size = "5" value="mark">
+      
+
+      Drawing tool:
+      <select id="dtool">
         <option value="rect">Rectangle</option>
         <option value="other">Dots</option>
         <option value="edit">Edit</option>
         <option value="check">Check</option>
         </select>
-        <input type="button" id="myBtn1" value="delete" onclic=""/>
-        <input type="button" id="myBtn2" value="save" onclic=""/>
-        <input type="button" id="pre" value="pre" onlick=""/>
-        <input type="text" id="num_pic" size="10"/>
-        <input type="button" id="after" value="after" onlick=""/><br>
+      <input type="button" id="deletebutton" value="delete" onclic="" />
+      <input type="button" id="savebutton" value="save" onclic="" />
+      <input type="button" id="pre" value="pre" onlick="" />
+      <input type="text" id="num_pic" size="10" />
+      <input type="button" id="after" value="after" onlick="" /><br>
     </div>
 
     <div id='content' style="position:relative; left:600px;top:-60px">
-        <textarea id="inputTextToSave" cols="50" rows="2"></textarea><br>
-        
+      <textarea id="inputTextToSave" cols="50" rows="2"></textarea><br>
+
     </div>
+
+
 
     <div id='content' style="position:relative; left:200px;top:-80px">
-        <input type="button" id="pic_resize" value="resize" onclic=""/>
-        <input type="text" id="resize_pic" size="10"/>
+      <input type="button" id="pic_resize" value="resize" onclic="" />
+      <input type="text" id="resize_pic" size="10" />
     </div>
-    
 
-</nav>
 
-<div id="container">
-<canvas id="imageView"></canvas>
-</div>
+  </nav>
+
+  <div id="container">
+    <canvas id="imageView"></canvas>
+  </div>
 </body>
 
 <script>
+  if (window.addEventListener) {
+    window.addEventListener('load', function () {
 
-if(window.addEventListener) {
-  window.addEventListener('load', function () {
-  
-  var Root=window.location.pathname;
-  var textRoot= Root.slice(1,-14);
-  
-  var txtRoot=textRoot+'labelTxt/';
-  var canvas, context, canvaso, contexto;
+      var Root = window.location.pathname;
+      var textRoot = Root.slice(1, -14);
 
-  //dot size
-  dot_size = 5;
+      var txtRoot = textRoot + 'labelTxt/';
+      var markRoot = textRoot + 'mark/';
+      var resolutionRoot = textRoot + 'resolution/';
+      var canvas, context, canvaso, contexto;
 
-  //line size
-  //line_size = 2;
-  line_size = 3;
-  // the content need to check
-  var dataDic = {'0A': 'passenger plane', '0B':'fighter aeroplane', '0C': 'radar warning aircraft', '1':'baseball diamond', '2':'bridge', '3':'ground track field', '4A':'car', '4B':'truck', '4C':'bus', '5A':'ship', '5B':'warship', '6':'tennis court', '7':'Basketball court','7B':'half basketball', '8':'storage tank','9':'soccer ball field','10':'Turntable', '11':'harbor', '12':'electric pole', '13':'parking lot', '14':'swimming pool', '15':'lake', '16':'helicopter','17':'airport', '18A':'viaduct', '18B':'18B', '18C':'18C', '18D':'18D', '18E':'18E', '18F':'18F', '18G':'18G', '18H':'18H', '18I':'18I', '18J':'18J', '18K':'18K', '18L':'18L', '18M':'18M', '18N':'18N', '4A_area':'4A_area', '4B_area':'4B_area', '5A_area':'5A_area', '8_area':'8_area', '13_area':'13_area', 'bridge':'bridge', 'plane':'plane', 'ship':'ship', 'storage':'storage', 'harbor':'harbor'};
-  var colordic = {'0A': '#FF00FF', '0B':'#FF00FF', '0C': '#FF00FF', '1':'#FAEBD7', '2':'#008000', '3':'#7FFFD4', '4A':'#000080', '4B':'#000080', '4C':'#000080', '5A':'#A52A2A', '5B':'#A52A2A', '6':'#8A2BE2', '7':'#DEB887','7B':'#DEB887', '8':'#5F9EA0','9':'#7FFF00','10':'#D2691E', '11':'#FFFF00', '12':'#6495ED', '13':'#FF1493', '14':'#DC143C', '15':'#FFA07A', '16':'#00008B','17':'#008B8B', '18A':'#B8860B', '18B':'#B8860B', '18C':'#B8860B', '18D':'#B8860B', '18E':'#B8860B', '18F':'#B8860B', '18G':'#B8860B', '18H':'#B8860B', '18I':'#B8860B', '18J':'#B8860B', '18K':'#B8860B', '18L':'#B8860B', '18M':'#B8860B', '18N':'#B8860B'}
-  
-  // The active tool instance.
-  var j=0,textState=false,saveState=false,editState=false,editSaveState=false,is_onlyOne=false,ifCheck=false;
-  var tool,Id_size=1,origin_index;
-  var tool_default = 'rect';
-  var arry=new Array()
-  var polygons=new Array();
-  var record_dots=new Array();
-  var box_content=new Array();
-  var record_index=new Array();
-  var record_line=new Array();
+      //dot size
+      dot_size = 5;
 
-  var count=0,Sumcount=0,count_index = 0;
-  var n=0;
-  var text=[];
-  //alert(text);
+      //line size
+      //line_size = 2;
+      line_size = 3;
+      // the content need to check
+      var dataDic = { '0A': 'passenger plane', '0B': 'fighter aeroplane', '0C': 'radar warning aircraft', '1': 'baseball diamond', '2': 'bridge', '3': 'ground track field', '4A': 'car', '4B': 'truck', '4C': 'bus', '5A': 'ship', '5B': 'warship', '6': 'tennis court', '7': 'Basketball court', '7B': 'half basketball', '8': 'storage tank', '9': 'soccer ball field', '10': 'Turntable', '11': 'harbor', '12': 'electric pole', '13': 'parking lot', '14': 'swimming pool', '15': 'lake', '16': 'helicopter', '17': 'airport', '18A': 'viaduct', '18B': '18B', '18C': '18C', '18D': '18D', '18E': '18E', '18F': '18F', '18G': '18G', '18H': '18H', '18I': '18I', '18J': '18J', '18K': '18K', '18L': '18L', '18M': '18M', '18N': '18N', '4A_area': '4A_area', '4B_area': '4B_area', '5A_area': '5A_area', '8_area': '8_area', '13_area': '13_area', 'bridge': 'bridge', 'plane': 'plane', 'ship': 'ship', 'storage': 'storage', 'harbor': 'harbor' };
+      var colordic = { '0A': '#FF00FF', '0B': '#FF00FF', '0C': '#FF00FF', '1': '#FAEBD7', '2': '#008000', '3': '#7FFFD4', '4A': '#000080', '4B': '#FFEFD5', '4C': '#FFA500', '5A': '#00FFFF', '5B': '#B0E0E6', '6': '#8A2BE2', '7': '#ADFF2F', '7B': '#ADFF2F', '8': '#5F9EA0', '9': '#7FFF00', '10': '#D2691E', '11': '#FFFF00', '12': '#6495ED', '13': '#FF1493', '14': '#DC143C', '15': '#FFA07A', '16': '#00008B', '17': '#008B8B', '18A': '#B8860B', '18B': '#B8860B', '18C': '#B8860B', '18D': '#B8860B', '18E': '#B8860B', '18F': '#B8860B', '18G': '#B8860B', '18H': '#B8860B', '18I': '#B8860B', '18J': '#B8860B', '18K': '#B8860B', '18L': '#B8860B', '18M': '#B8860B', '18N': '#B8860B' }
 
-  var path,content;
+      // The active tool instance.
+      var j = 0, textState = false, saveState = false, editState = false, editSaveState = false, is_onlyOne = false, ifCheck = false;
+      var tool, Id_size = 1, origin_index;
+      var tool_default = 'rect';
+      var arry = new Array()
+      var polygons = new Array();
+      var record_dots = new Array();
+      var box_content = new Array();
+      var record_index = new Array();
+      var record_line = new Array();
 
-  var textToSaveAsBlob = new Blob();
-  var filenames = g_FOLDER_CONTENTS.match(/\S+/g);
-  document.getElementById("Total_Num").value=filenames.length;
+      var count = 0, Sumcount = 0, count_index = 0;
+      var n = 0;
+      var text = [];
+      //alert(text);
 
-
-  function init () {
-    var x = document.getElementById("myBtn1");
-    var y=document.getElementById("myBtn2");
-    var after= document.getElementById("after");
-    var pre= document.getElementById("pre");
-    var resize=document.getElementById('pic_resize');
-    
-    var extensiondFirst = filenames[0].substring(filenames[0].length-3);
-    //alert(filenames[0]);
-    canvaso = document.getElementById('imageView');
-    contexto = canvaso.getContext('2d');
-    //canvaso.width=img.width;
-    //canvaso.height=img.height;
-   
-  //press Enter then switch to the selected picture 
-  $(document).keydown(function(event){
-	   switch(event.keyCode) {
-	   case 13:
-	   j=document.getElementById("num_pic").value;
-	   if((j>=0)&&(j<=(filenames.length-1)))
-	   { 
-	    load_picture();
-		document.getElementById("inputTextToSave").value = "";
-	   }
-	   else
-	   alert('please input a correct number!');
-	   break;
-	   default:
-      }
-    });
-
-    if (!canvaso) {
-      alert('Error: I cannot find the canvas element!');
-      return;
-    }
-
-    // Get the 2D canvas context.
-    //contexto = canvaso.getContext('2d');
-    if (!contexto) {
-      alert('Error: failed to getContext!');
-      return;
-    }
+      //when use dots, count == 4, the flag_save become false, when save, the flag_save = true
+      var flag_save = true
+      var tmp_poly = new Array();
+      var select_point = -1;
 
 
-    // Add the temporary canvas.
-    var container = canvaso.parentNode;
-    canvas_bg = document.createElement('canvas');
-    if (!canvas_bg) {
-      alert('Error: I cannot create a new canvas element!');
-      return;
-    }
+      var path, content;
 
-    canvas_bg.id     = 'imageTemp';
-    container.appendChild(canvas_bg);
-    context_bg = canvas_bg.getContext('2d');
-
-    canvas= document.createElement('canvas');
-    if (!canvas) {
-      alert('Error: I cannot create a new canvas element!');
-      return;
-    }
-
-    canvas.id    = 'myCanvas_bg';
-    container.appendChild(canvas);
-    context = canvas.getContext('2d');
-   
-  //Load the first picture
-    //alert('extensiondFirst:'+extensiondFirst);
-    //if((extensiondFirst=="jpg")||(extensiondFirst=="png"))
-    //{
-      var image = document.createElement("img");
-      image.src = "images/" + filenames[0];
-      var idx = filenames[0].lastIndexOf(".");
-      //var writerPath =txtRoot+filenames[j].substring(0,index)+'.txt';      
-      path=txtRoot+filenames[0].substring(0,idx)+'.txt';
-      //alert(path);
-    
-		  image.onload=function()
-		 { 
-      document.getElementById("resize_pic").value=1;
-		   if (image.width>window.screen.width)
-			{
-			  
-			  Id_size=1000/image.width;
-			  //Id_size=Id_size.toFixed(2);
-			  image.height=image.height*Id_size;
-			  image.width=image.width*Id_size;
-        document.getElementById("resize_pic").value=Id_size.toFixed(2);		 
-			}
-       else if(image.width<300)
-       {
-        Id_size=500/image.width;
-        //Id_size=Id_size.toFixed(2);
-        image.height=image.height*Id_size;
-        image.width=image.width*Id_size;
-        document.getElementById("resize_pic").value=Id_size.toFixed(2);     
-       }
-
-
-		  canvaso.width=image.width;
-		  canvaso.height=image.height;
-
-		  canvas.width  = canvaso.width;
-		  canvas.height = canvaso.height;
-
-		  canvas_bg.width = canvaso.width;
-		  canvas_bg.height= canvaso.height; 
-		  contexto.drawImage(image,0,0,image.width,image.height);
-		  document.getElementById("num_pic").value=0;
-		  readTxt(Id_size);
+      var textToSaveAsBlob = new Blob();
+      var filenames = g_FOLDER_CONTENTS.match(/\S+/g);
+      document.getElementById("Total_Num").value = filenames.length;
       
-		}
-      //alert(document.getElementById("num_pic").value);
-    //}
-    //else
-   // {
-     //alert('Error in the image form!');
-    //}
-    
-    var tool_select = document.getElementById('dtool');
-    if (!tool_select) 
-	  {
-      alert('Error: failed to get the dtool element!');
-      return;
-    }
-    tool_select.addEventListener('change', ev_tool_change, false);
 
-    // Activate the default tool.
-    if (tools[tool_default]) {
-      tool = new tools[tool_default]();
-      tool_select.value = tool_default;
-    }
+      function init() 
+      {
+        var deletebutton = document.getElementById("deletebutton");
+        var savebutton = document.getElementById("savebutton");
+        var after = document.getElementById("after");
+        var pre = document.getElementById("pre");
+        var resize = document.getElementById('pic_resize');
+        var mark = document.getElementById('mark')
+        var countinstances = document.getElementById("countinstance");
 
-    // Attach the mousedown, mousemove ,mouseup and click event listeners.
-    canvas.addEventListener('mousedown', ev_canvas, false);
-    canvas.addEventListener('mousemove', ev_canvas, false);
-    canvas.addEventListener('mouseup',   ev_canvas, false);
-    canvas.addEventListener('click',   ev_canvas, false);
-    x.addEventListener("click", delet);
-    y.addEventListener("click", save);
-    after.addEventListener("click", later_picture);
-    pre.addEventListener("click", pre_picture);
-    resize.addEventListener("click",pic_resize);
-  }
+        var extensiondFirst = filenames[0].substring(filenames[0].length - 3);
+        //alert(filenames[0]);
+        canvaso = document.getElementById('imageView');
+        contexto = canvaso.getContext('2d');
+        //canvaso.width=img.width;
+        //canvaso.height=img.height;
 
-  // The general-purpose event handler. This function just determines the mouse 
-  // position relative to the canvas element.
-  function ev_canvas (ev) {
-   //var style = window.getComputedStyle(canvas, null);
-   //var borderLeft = parseFloat(style["border-left-width"]);
-   //var borderTop = parseFloat(style["border-top-width"]);
-   var rect = canvas.getBoundingClientRect();
-    if (ev.layerX || ev.layerX == 0) { // Firefox
-      //ev._x = ev.layerX;
-      ev._x = ev.clientX;
-      //ev._y = ev.layerY;
-      ev._y =ev.clientY;
-    } 
-    else if (ev.offsetX || ev.offsetX == 0) { // Opera
-     // ev._x = ev.offsetX;
-      ev._x = ev.clientX;
-     //ev._y = ev.offsetY;
-      ev._y = ev.clientY;
-    }
-    ev._x -=rect.left;
-    ev._y -=rect.top;
-
-    // Call the event handler of the tool.
-    var func = tool[ev.type];   
-    //alert(ev.type);
-    if (func) {
-      func(ev);
-    }
-  }
-
-  // The event handler for any changes made to the tool selector.
-  function ev_tool_change (ev) {
-    if (tools[this.value]) {
-      tool = new tools[this.value]();
-    }
-  }
-
-    // This object holds the implementation of each drawing tool.
-    var tools = {};
-
-    // The drawing other.
-    tools.other = function () {
-    var tool = this;
-    this.started = false;
-    editState=false;
-    ifCheck=false;
-    context.clearRect(0,0,canvas.width,canvas.height);
-    document.getElementById("inputTextToSave").value='';
-
-    // This is called when you start holding down the mouse button.
-    // This starts the pencil drawing.
-    this.click = function (ev) {
-        
-        arry[count+n]=ev._x;
-        arry[count+n+1]=ev._y;
-       // alert('ev._x:'+ev._x+'ev._y:'+ev._y);
-        Sumcount++;
-        count++;
-        n++;
-        //alert('n：'+n);
-
-        context.fillStyle="#FF0000";
-        context.beginPath();
-        context.arc(ev._x, ev._y,Math.min( dot_size*Id_size, dot_size),0,2*Math.PI,true);
-        context.fill();
-        //alert('x:'+arry[6]+',y:'+arry[7]);
-        //alert("count"+count);
-        //alert("arry[0]:"+arry[0])
-
-        if((count==4)&&(arry[0]!=undefined))
-        {
-          context.clearRect(0, 0, canvas.width, canvas.height); 
-
-          //context.strokeStyle = "#FF0000";
-          //drawUppercanvas(arry);
-           context.beginPath();
-           context.strokeStyle = "red";
-           context.moveTo(arry[0],arry[1]);//起始点  
-
-           for(var i=0,j=0;i<4;i++,j++)  
-           {
-             //context.beginPath();
-             //context.strokeStyle = "red";
-             //alert(context_bg.strokeStyle);
-             context.lineTo(arry[(i+j)%8],arry[(i+j+1)%8]);//起始点
-             //context.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
-             //alert('hello');
-
-           }
-            context.lineWidth = line_size; 
-            context.closePath();
-            context.stroke();  
-
-            context.fillStyle="yellow";
-            context.beginPath();
-            context.arc(arry[0], arry[1],Math.min(dot_size*Id_size, dot_size),0,2*Math.PI,true);
-            context.fill();
-        
-          count=0;
-          n=0;
-        //tool.started = true;
-        }
-
-        else if((count==4)&&(arry[0]==undefined))
-        {
-          count = 0;
-          n = 0;
-          alert("There is something wrong with the labelTool, try to redraw these dots.")
-        }
-        
-        tool.started = true;
-    };
-
-
-    // This is called when you release the mouse button.
-    this.mouseup = function (ev) {
-      if (tool.started) {
-        //tool.mousemove(ev);
-        tool.started = false;
-        //img_update();
-      }
-    };
-  };
-
-  // The rectangle tool.
-    tools.rect = function () {
-    
-    var tool = this;
-    this.started = false;
-    editState=false;
-    ifCheck=false;
-    context.clearRect(0,0,canvas.width,canvas.height);
-    document.getElementById("inputTextToSave").value='';
-
-    this.mousedown = function (ev) {
-      tool.started = true;
-      tool.x0 = ev._x;
-      tool.y0 = ev._y;
-    };
-
-    this.mousemove = function (ev) {
-      if (!tool.started) {
-        return;
-      }
-
-      var x = Math.min(ev._x,  tool.x0),
-          y = Math.min(ev._y,  tool.y0),
-          w = Math.abs(ev._x - tool.x0),
-          h = Math.abs(ev._y - tool.y0);
-          arry[0]=x,arry[1]=y,arry[2]=x+w,arry[3]=y,arry[4]=x+w,arry[5]=y+h,arry[6]=x,arry[7]=y+h;
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (!w || !h) {
-        return;
-      }
-      context.strokeStyle = "#FF0000";
-      context.lineWidth = line_size;
-      context.strokeRect(x, y, w, h);
-
-      context.fillStyle="yellow";
-      context.beginPath();
-      context.arc(x, y,Math.min(dot_size*Id_size, dot_size),0,2*Math.PI,true);
-      context.fill();
-    };
-
-    this.mouseup = function (ev) {
-      if (tool.started) {
-        tool.mousemove(ev);
-        tool.started = false;
-        //img_update();
-       }
-      };
-    Sumcount=4;
-    };
-
-    tools.check=function(){
-    var tool = this;
-    this.started = false;
-    editState=false;
-    ifCheck = true;
-    readTxt(Id_size);
-    //whenCheck();
-  };
-
-  function whenCheck(){
-    document.getElementById("inputTextToSave").value='';
-
-    context.clearRect(0,0,canvas.width,canvas.height);
-    //context_bg.clearRect(0,0,canvas.width,canvas.height);
-
-    var len = polygons.length;
-    //alert('len:'+lepolygonn)
-    for (var k=0; k<len; k++)
-    {
-     var label = box_content[k].split(' ');
-     //alert('label'+label)
-     label = label[0];
-     //drawUppercanvas(polygons[k],'#F0F8FF');
-     drawUppercanvas(polygons[k], colordic[label])
-     //alert('after draw' );
-     context.fillStyle="yellow";
-     context.beginPath();
-     context.arc(polygons[k][0], polygons[k][1],Math.min(dot_size * Id_size, dot_size),0,2*Math.PI,true);
-     context.fill();
-
-
-     context.font = "20px serif";
-     context.fillStyle = 'red';
-     //alert(dataDic[label]);
-     context.fillText(dataDic[label],polygons[k][0]-5,polygons[k][1]-5);
-    }
-  }
-
-    
-    tools.edit=function () {
-
-    //editState=true;
-    var tool = this;
-    this.started = true;
-    ifCheck=false;
-    //var len = polygons.length;
-    var dots = new Array();
-    var record_content = new Array();
-
-    var parameter,dis;
-    var a,b,c,d,h,dupli_polygon;
-    var x1,y1,x2,y2;
-    var num = 0;
-    //alert('Id_size:'+Id_size);
-    context.clearRect(0,0,canvas.width,canvas.height);
-    readTxt(Id_size);
-
-    //var record_index =new Array();
-
-    this.click=function(ev){
-
-      editState=true;
-      editSaveState=false;
-      var x=ev._x;
-      var y=ev._y;
-      var new_dots=new Array();
-      var new_content=new Array();
-      var count_newDots=0;
-      var len = polygons.length;
-
-
-      //alert('polygons edit:'+polygons);
-      for (var j=0; j<len; j++)
-      {  
-        
-        for (var p=0, q=0; p<(polygons[j].length/2); p++, q++)
-        {
-          dots[p+q] = polygons[j][(p+q)];
-          dots[p+q+1] = polygons[j][(p+q+1)];
-        }
-
-
-        for (var m=0,n=0; m<4; m++,n++)
-        {   
-          var whether_draw =false;
-
-          x1 = dots[(m+n)%8]; y1 = dots[(m+n+1)%8];
-          x2 = dots[(m+n+2)%8]; y2 = dots[(m+n+3)%8];
-
-          parameter = getLineFunction(x1,y1,x2,y2);
-
-          //alert(parameter);
-
-          a=parameter[0];
-          b=parameter[1];
-          c=parameter[2];
-
-          d=Math.abs(a*x+b*y+c);
-          h=Math.sqrt(a*a+b*b);
-          dis=d/(h*1.0);
-          
-         // if(j==14)
-         // {alert(dis);}
-
-          if (dis<3)
-          {  
-            //alert('here');
-            whether_draw =true;
-            var x_max,x_min,y_max,y_min;
-            //alert('whether_draw1'+whether_draw);
-            x_max=x2; x_min=x1;
-            y_max=y2; y_min=y1;
-
-            if (y1==y2)
-            {
-              //alert('hello1');
-              if (x1>x2)
-              {
-               x_max=x1;
-               x_min=x2;
-              }
-
-              if ((x<x_min)||(x>x_max))             
-                whether_draw=false;            
-            }
-
-            else if (x1==x2)
-            {
-              if(y1>y2)
-              {
-                y_max=y1;
-                y_min=y2;
-              }
-              if ((y<y_min)||(y>y_max))
-                whether_draw = false;
-            }
-
-            else 
-            {
-              x_max = x1>x2?x1:x2
-              x_min = x1<x2?x1:x2
-              y_max = y1>y2?y1:y2
-              y_min = y1<y2?y1:y2
-
-              //alert((x>= x_min && x<=x_max))
-              if ((x>= x_min-3 && x<=x_max+3)&&(y>= y_min-3 && y<=y_max+3))
-              {
-                whether_draw = true;
+        //press Enter then switch to the selected picture 
+        $(document).keydown(function (event) {
+          switch (event.keyCode) {
+            case 13:
+              j = document.getElementById("num_pic").value;
+              if ((j >= 0) && (j <= (filenames.length - 1))) {
+                load_picture();
+                document.getElementById("inputTextToSave").value = "";
               }
               else
-                {whether_draw = false;}
+                alert('please input a correct number!');
+              break;
+            default:
+          }
+          if (event.keyCode == '86') {
+
+            if ((document.getElementById("dtool").value == "other") && (flag_save == false)) {
+              document.getElementById("inputTextToSave").value = document.getElementById("LastLabel").value;
+              save();
+            } else if (document.getElementById("dtool").value == "rect") {
+              document.getElementById("inputTextToSave").value = document.getElementById("LastLabel").value;
+              save();
+            }
+          }
+
+        });
+
+        if (!canvaso) {
+          alert('Error: I cannot find the canvas element!');
+          return;
+        }
+
+        // Get the 2D canvas context.
+        //contexto = canvaso.getContext('2d');
+        if (!contexto) {
+          alert('Error: failed to getContext!');
+          return;
+        }
+
+
+        // Add the temporary canvas.
+        var container = canvaso.parentNode;
+        canvas_bg = document.createElement('canvas');
+        if (!canvas_bg) {
+          alert('Error: I cannot create a new canvas element!');
+          return;
+        }
+
+        canvas_bg.id = 'imageTemp';
+        container.appendChild(canvas_bg);
+        context_bg = canvas_bg.getContext('2d');
+
+        canvas = document.createElement('canvas');
+        if (!canvas) {
+          alert('Error: I cannot create a new canvas element!');
+          return;
+        }
+
+        canvas.id = 'myCanvas_bg';
+        container.appendChild(canvas);
+        context = canvas.getContext('2d');
+
+        //Load the first picture
+        //alert('extensiondFirst:'+extensiondFirst);
+        //if((extensiondFirst=="jpg")||(extensiondFirst=="png"))
+        //{
+        var image = document.createElement("img");
+        image.src = "images/" + filenames[0];
+        var idx = filenames[0].lastIndexOf(".");
+        //var writerPath =txtRoot+filenames[j].substring(0,index)+'.txt';      
+        path = txtRoot + filenames[0].substring(0, idx) + '.txt';
+        //alert(path);
+
+        image.onload = function () {
+          document.getElementById("resize_pic").value = 1;
+          if (image.width > window.screen.width) {
+
+            Id_size = 1000 / image.width;
+            //Id_size=Id_size.toFixed(2);
+            image.height = image.height * Id_size;
+            image.width = image.width * Id_size;
+            document.getElementById("resize_pic").value = Id_size.toFixed(2);
+          }
+          else if (image.width < 300) {
+            Id_size = 500 / image.width;
+            //Id_size=Id_size.toFixed(2);
+            image.height = image.height * Id_size;
+            image.width = image.width * Id_size;
+            document.getElementById("resize_pic").value = Id_size.toFixed(2);
+          }
+
+
+          canvaso.width = image.width;
+          canvaso.height = image.height;
+
+          canvas.width = canvaso.width;
+          canvas.height = canvaso.height;
+
+          canvas_bg.width = canvaso.width;
+          canvas_bg.height = canvaso.height;
+          contexto.drawImage(image, 0, 0, image.width, image.height);
+          document.getElementById("num_pic").value = 0;
+          document.getElementById("CurrentName").value = filenames[0]
+          readTxt(Id_size);
+
+        }
+        //alert(document.getElementById("num_pic").value);
+        //}
+        //else
+        // {
+        //alert('Error in the image form!');
+        //}
+
+        var tool_select = document.getElementById('dtool');
+        if (!tool_select) {
+          alert('Error: failed to get the dtool element!');
+          return;
+        }
+        tool_select.addEventListener('change', ev_tool_change, false);
+        // Activate the default tool.
+        if (tools[tool_default]) {
+          tool = new tools[tool_default]();
+          tool_select.value = tool_default;
+        }
+
+        // Attach the mousedown, mousemove ,mouseup and click event listeners.
+        canvas.addEventListener('mousedown', ev_canvas, false);
+        canvas.addEventListener('mousemove', ev_canvas, false);
+        canvas.addEventListener('mouseup', ev_canvas, false);
+        canvas.addEventListener('click', ev_canvas, false);
+        canvas.addEventListener("mouseup", endchange)
+
+        deletebutton.addEventListener("click", delet);
+        savebutton.addEventListener("click", save);
+        after.addEventListener("click", later_picture);
+        pre.addEventListener("click", pre_picture);
+        resize.addEventListener("click", pic_resize);
+        mark.addEventListener("click", writeMark)
+        countinstances.addEventListener("click", countwhole);
+      }
+
+      function endchange() {
+        selectpoint = -1;
+        //alert(selectpoint)
+      }
+
+
+      // The general-purpose event handler. This function just determines the mouse 
+      // position relative to the canvas element.
+      function ev_canvas(ev) {
+        //var style = window.getComputedStyle(canvas, null);
+        //var borderLeft = parseFloat(style["border-left-width"]);
+        //var borderTop = parseFloat(style["border-top-width"]);
+        var rect = canvas.getBoundingClientRect();
+        if (ev.layerX || ev.layerX == 0) { // Firefox
+          //ev._x = ev.layerX;
+          ev._x = ev.clientX;
+          //ev._y = ev.layerY;
+          ev._y = ev.clientY;
+        }
+        else if (ev.offsetX || ev.offsetX == 0) { // Opera
+          // ev._x = ev.offsetX;
+          ev._x = ev.clientX;
+          //ev._y = ev.offsetY;
+          ev._y = ev.clientY;
+        }
+        ev._x -= rect.left;
+        ev._y -= rect.top;
+
+        // Call the event handler of the tool.
+        var func = tool[ev.type];
+        //alert(ev.type);
+        if (func) {
+          func(ev);
+        }
+      }
+
+      // The event handler for any changes made to the tool selector.
+      function ev_tool_change(ev) {
+        if (tools[this.value]) {
+          tool = new tools[this.value]();
+        }
+      }
+
+      // This object holds the implementation of each drawing tool.
+      var tools = {};
+
+      // The drawing other.
+      tools.other = function () {
+        var tool = this;
+        this.started = false;
+        editState = false;
+        ifCheck = false;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById("inputTextToSave").value = '';
+
+
+
+        flag_save = true
+        // This is called when you start holding down the mouse button.
+        // This starts the pencil drawing.
+        this.click = function (ev) {
+
+          if (flag_save) {
+            arry[count + n] = ev._x;
+            arry[count + n + 1] = ev._y;
+
+            //tmp_poly
+            tmp_poly[count + n] = ev._x;
+            tmp_poly[count + n + 1] = ev._y;
+            // alert('ev._x:'+ev._x+'ev._y:'+ev._y);
+            Sumcount++;
+            count++;
+            n++;
+            //alert('n：'+n);
+
+            context.fillStyle = "#FF0000";
+            context.beginPath();
+            context.arc(ev._x, ev._y, Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+            context.fill();
+            //alert('x:'+arry[6]+',y:'+arry[7]);
+            //alert("count"+count);
+            //alert("arry[0]:"+arry[0])
+
+            if ((count == 4) && (arry[0] != undefined)) {
+              context.clearRect(0, 0, canvas.width, canvas.height);
+
+              //context.strokeStyle = "#FF0000";
+              //drawUppercanvas(arry);
+              context.beginPath();
+              context.strokeStyle = "red";
+              context.moveTo(arry[0], arry[1]);//起始点  
+
+              for (var i = 0, j = 0; i < 4; i++ , j++) {
+                //context.beginPath();
+                //context.strokeStyle = "red";
+                //alert(context_bg.strokeStyle);
+                context.lineTo(arry[(i + j) % 8], arry[(i + j + 1) % 8]);//起始点
+                //context.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
+                //alert('hello');
+
+              }
+              context.lineWidth = line_size;
+              context.closePath();
+              context.stroke();
+
+              context.fillStyle = "yellow";
+              context.beginPath();
+              context.arc(arry[0], arry[1], Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+              context.fill();
+
+              flag_save = false;
+              count = 0;
+              n = 0;
             }
 
-            //alert(whether_draw);
-               
-            if (whether_draw)
-            {
-              //alert('ahead j')
-              record_dots[num] = dots;
-              record_content[num] = box_content[j];
-              //alert('j:'+j);
-              record_index[count_index] = j;
+            else if ((count == 4) && (arry[0] == undefined)) {
+              count = 0;
+              n = 0;
+              alert("There is something wrong with the labelTool, try to redraw these dots.")
+            }
 
-              num = num + 1;
-              count_index = count_index + 1;
-             //alert('in whether_draw'+dots);
-              break;
+            tool.started = true;
+
+          }
+        };
+
+
+        // add drag the point
+        this.mousedown = function (ev) {
+          // only allow adjust the poly before save
+          select_point = -1;
+          if (!flag_save) {
+            var mousedown_x = ev._x;
+            var mousedown_y = ev._y;
+
+            for (var i = 0; i < 4; i++) {
+              var dis = Math.sqrt(Math.pow(arry[2 * i] - mousedown_x, 2) + Math.pow(arry[2 * i + 1] - mousedown_y, 2));
+              if (dis < 5) {
+                select_point = i;
+                break;
+              }
             }
           }
         }
+        this.mousemove = function (ev) {
 
-        dots=[];
+          if (select_point != -1) {
+            arry[2 * select_point] = ev._x
+            arry[2 * select_point + 1] = ev._y
+          }
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          //context.strokeStyle = "#FF0000";
+          //drawUppercanvas(arry);
+          context.beginPath();
+          context.strokeStyle = "red";
+          context.moveTo(arry[0], arry[1]);//起始点  
+
+          for (var i = 0, j = 0; i < 4; i++ , j++) {
+            context.lineTo(arry[(i + j) % 8], arry[(i + j + 1) % 8]);//起始点
+          }
+          context.lineWidth = line_size;
+          context.closePath();
+          context.stroke();
+
+          context.fillStyle = "yellow";
+          context.beginPath();
+          context.arc(arry[0], arry[1], Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+          context.fill();
+
+        }
+
+        // this.mouseup = function (ev) {
+        // select_point = -1
+        //alert(selectpoint)
+        //}
+
+
+
+
+        // This is called when you release the mouse button.
+        this.mouseup = function (ev) {
+          if (tool.started) {
+            //tool.mousemove(ev);
+            tool.started = false;
+            //img_update();
+          }
+          select_point = -1
+        };
+      };
+
+      // The rectangle tool.
+      tools.rect = function () {
+
+        var tool = this;
+        this.started = false;
+        editState = false;
+        ifCheck = false;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById("inputTextToSave").value = '';
+
+        this.mousedown = function (ev) {
+          tool.started = true;
+          tool.x0 = ev._x;
+          tool.y0 = ev._y;
+        };
+
+        this.mousemove = function (ev) {
+          if (!tool.started) {
+            return;
+          }
+
+          var x = Math.min(ev._x, tool.x0),
+            y = Math.min(ev._y, tool.y0),
+            w = Math.abs(ev._x - tool.x0),
+            h = Math.abs(ev._y - tool.y0);
+          arry[0] = x, arry[1] = y, arry[2] = x + w, arry[3] = y, arry[4] = x + w, arry[5] = y + h, arry[6] = x, arry[7] = y + h;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          if (!w || !h) {
+            return;
+          }
+          context.strokeStyle = "#FF0000";
+          context.lineWidth = line_size;
+          context.strokeRect(x, y, w, h);
+
+          context.fillStyle = "yellow";
+          context.beginPath();
+          context.arc(x, y, Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+          context.fill();
+        };
+
+        this.mouseup = function (ev) {
+          if (tool.started) {
+            tool.mousemove(ev);
+            tool.started = false;
+            //img_update();
+          }
+        };
+        Sumcount = 4;
+      };
+
+      tools.check = function () {
+        var tool = this;
+        this.started = false;
+        editState = false;
+        ifCheck = true;
+        readTxt(Id_size);
+        //whenCheck();
+      };
+
+      function whenCheck() {
+        document.getElementById("inputTextToSave").value = '';
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        //context_bg.clearRect(0,0,canvas.width,canvas.height);
+
+        var len = polygons.length;
+        var annotated_num  = document.getElementById('annotated')
+        annotated_num.value = len;
+        //alert('len:'+lepolygonn)
+        for (var k = 0; k < len; k++) {
+          var label = box_content[k].split(' ');
+          //alert('label'+label)
+          label = label[0];
+          //drawUppercanvas(polygons[k],'#F0F8FF');
+          drawUppercanvas(polygons[k], colordic[label])
+          //alert('after draw' );
+          context.fillStyle = "yellow";
+          context.beginPath();
+          context.arc(polygons[k][0], polygons[k][1], Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+          context.fill();
+
+
+          context.font = "20px serif";
+          context.fillStyle = 'red';
+          //alert(dataDic[label]);
+          context.fillText(dataDic[label], polygons[k][0] - 5, polygons[k][1] - 5);
+        }
       }
 
-        //alert('record_index:'+record_index);
-        dupli_polygon = is_dupilcate(record_index);
-        //only one dot whose dis to the clicked dot is smaller than 3
-        if (num==1)
-        {
 
-          if(dupli_polygon.length>0)
-            {
+      tools.edit = function () {
+
+        //editState=true;
+        var tool = this;
+        this.started = true;
+        ifCheck = false;
+        //var len = polygons.length;
+        var dots = new Array();
+        var record_content = new Array();
+
+        var parameter, dis;
+        var a, b, c, d, h, dupli_polygon;
+        var x1, y1, x2, y2;
+        var num = 0;
+        //alert('Id_size:'+Id_size);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        readTxt(Id_size);
+
+        //var record_index =new Array();
+
+        this.click = function (ev) {
+
+          editState = true;
+          editSaveState = false;
+          var x = ev._x;
+          var y = ev._y;
+          var new_dots = new Array();
+          var new_content = new Array();
+          var count_newDots = 0;
+          var len = polygons.length;
+
+
+          //alert('polygons edit:'+polygons);
+          for (var j = 0; j < len; j++) {
+
+            for (var p = 0, q = 0; p < (polygons[j].length / 2); p++ , q++) {
+              dots[p + q] = polygons[j][(p + q)];
+              dots[p + q + 1] = polygons[j][(p + q + 1)];
+            }
+
+
+            for (var m = 0, n = 0; m < 4; m++ , n++) {
+              var whether_draw = false;
+
+              x1 = dots[(m + n) % 8]; y1 = dots[(m + n + 1) % 8];
+              x2 = dots[(m + n + 2) % 8]; y2 = dots[(m + n + 3) % 8];
+
+              parameter = getLineFunction(x1, y1, x2, y2);
+
+              //alert(parameter);
+
+              a = parameter[0];
+              b = parameter[1];
+              c = parameter[2];
+
+              d = Math.abs(a * x + b * y + c);
+              h = Math.sqrt(a * a + b * b);
+              dis = d / (h * 1.0);
+
+              // if(j==14)
+              // {alert(dis);}
+
+              if (dis < 3) {
+                //alert('here');
+                whether_draw = true;
+                var x_max, x_min, y_max, y_min;
+                //alert('whether_draw1'+whether_draw);
+                x_max = x2; x_min = x1;
+                y_max = y2; y_min = y1;
+
+                if (y1 == y2) {
+                  //alert('hello1');
+                  if (x1 > x2) {
+                    x_max = x1;
+                    x_min = x2;
+                  }
+
+                  if ((x < x_min) || (x > x_max))
+                    whether_draw = false;
+                }
+
+                else if (x1 == x2) {
+                  if (y1 > y2) {
+                    y_max = y1;
+                    y_min = y2;
+                  }
+                  if ((y < y_min) || (y > y_max))
+                    whether_draw = false;
+                }
+
+                else {
+                  x_max = x1 > x2 ? x1 : x2
+                  x_min = x1 < x2 ? x1 : x2
+                  y_max = y1 > y2 ? y1 : y2
+                  y_min = y1 < y2 ? y1 : y2
+
+                  //alert((x>= x_min && x<=x_max))
+                  if ((x >= x_min - 3 && x <= x_max + 3) && (y >= y_min - 3 && y <= y_max + 3)) {
+                    whether_draw = true;
+                  }
+                  else { whether_draw = false; }
+                }
+
+                //alert(whether_draw);
+
+                if (whether_draw) {
+                  //alert('ahead j')
+                  record_dots[num] = dots;
+                  record_content[num] = box_content[j];
+                  //alert('j:'+j);
+                  record_index[count_index] = j;
+
+                  num = num + 1;
+                  count_index = count_index + 1;
+                  //alert('in whether_draw'+dots);
+                  break;
+                }
+              }
+            }
+
+            dots = [];
+          }
+
+          //alert('record_index:'+record_index);
+          dupli_polygon = is_dupilcate(record_index);
+          //only one dot whose dis to the clicked dot is smaller than 3
+          if (num == 1) {
+
+            if (dupli_polygon.length > 0) {
               context.clearRect(0, 0, canvas.width, canvas.height);
               document.getElementById("inputTextToSave").value = "";
               record_index = [];
               count_index = 0;
             }
-          //alert(context_bg.strokeStyle);
-          else if(record_index.length == 1)
-          {
-            text=[];
-            is_onlyOne=true;
-            editSaveState=true;
-            drawUppercanvas(record_dots[0]);
-            document.getElementById("inputTextToSave").value = record_content[0];
-            origin_index=record_index[0];
- 
-            for(var ii=0; ii<len; ii++)
-            {
-              if(ii!=record_index[0])
-              {
-                new_dots[count_newDots]=polygons[ii];
-                new_content[count_newDots]=box_content[ii];
+            //alert(context_bg.strokeStyle);
+            else if (record_index.length == 1) {
+              text = [];
+              is_onlyOne = true;
+              editSaveState = true;
+              drawUppercanvas(record_dots[0]);
+              document.getElementById("inputTextToSave").value = record_content[0];
+              origin_index = record_index[0];
 
-                count_newDots=count_newDots+1;
-              }   
-               
-            }
+              for (var ii = 0; ii < len; ii++) {
+                if (ii != record_index[0]) {
+                  new_dots[count_newDots] = polygons[ii];
+                  new_content[count_newDots] = box_content[ii];
+
+                  count_newDots = count_newDots + 1;
+                }
+
+              }
               //alert('new_dots[0]:'+new_dots[0]);             
-            for(var p=0;p<count_newDots;p++)
-            {
-              for (var tmp=0; tmp<new_dots[p].length; tmp++)
-              {
-                text +=Math.round(new_dots[p][tmp]/Id_size).toString()+' ';
+              for (var p = 0; p < count_newDots; p++) {
+                for (var tmp = 0; tmp < new_dots[p].length; tmp++) {
+                  text += Math.round(new_dots[p][tmp] / Id_size).toString() + ' ';
+                }
+
+                text = text + new_content[p] + '\n';
               }
 
-              text = text+new_content[p]+'\n';
             }
+            else if (record_index.length == 2) {
+              text = [];
+              is_onlyOne = true;
+              editSaveState = true;
 
-          }
-          else if(record_index.length == 2)
-          {
-            text=[];
-            is_onlyOne=true;
-            editSaveState=true;
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              drawUppercanvas(record_dots[0]);
+              //alert('record_content:'+record_content[0]);
+              document.getElementById("inputTextToSave").value = record_content[0];
+              origin_index = record_index[1];
 
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            drawUppercanvas(record_dots[0]);
-            //alert('record_content:'+record_content[0]);
-            document.getElementById("inputTextToSave").value = record_content[0];
-            origin_index=record_index[1];
+              for (var ii = 0; ii < len; ii++) {
+                if (ii != origin_index) {
+                  new_dots[count_newDots] = polygons[ii];
+                  new_content[count_newDots] = box_content[ii];
+                  count_newDots = count_newDots + 1;
+                }
 
-            for(var ii=0; ii<len; ii++)
-            {
-              if(ii!=origin_index)
-              {
-                new_dots[count_newDots]=polygons[ii];
-                new_content[count_newDots]=box_content[ii];
-                count_newDots=count_newDots+1;
-              }   
-               
-            }
-              //alert('new_dots[0]:'+new_dots[0]);             
-            for(var p=0;p<count_newDots;p++)
-            {
-              for (var tmp=0; tmp<new_dots[p].length; tmp++)
-              {
-                text +=Math.round(new_dots[p][tmp]/Id_size).toString()+' ';
               }
-              text = text+new_content[p]+'\n';
+              //alert('new_dots[0]:'+new_dots[0]);             
+              for (var p = 0; p < count_newDots; p++) {
+                for (var tmp = 0; tmp < new_dots[p].length; tmp++) {
+                  text += Math.round(new_dots[p][tmp] / Id_size).toString() + ' ';
+                }
+                text = text + new_content[p] + '\n';
+              }
+
+              record_index = [];
+              record_index[0] = origin_index;
+              count_index = 1;
             }
-            
-            record_index=[];
-            record_index[0]=origin_index;
-            count_index=1;
-          }
-            count_newDots=0;
-            num=0;
+            count_newDots = 0;
+            num = 0;
           }
 
-          else if (num>1)
-          {
+          else if (num > 1) {
 
             var record_dis = new Array();
-            for (var i=0; i<num; i++)
-            {
+            for (var i = 0; i < num; i++) {
               var x_1 = record_dots[i][0];
               var y_1 = record_dots[i][1];
               var x_2 = record_dots[i][4];
               var y_2 = record_dots[i][5];
 
-              var x_center = (x_1+x_2)/(2*1.0);
-              var y_center = (y_1+y_2)/(2*1.0);
+              var x_center = (x_1 + x_2) / (2 * 1.0);
+              var y_center = (y_1 + y_2) / (2 * 1.0);
 
-              record_dis[i] = Math.pow((x_center-x),2) + Math.pow((y_center-y),2);
+              record_dis[i] = Math.pow((x_center - x), 2) + Math.pow((y_center - y), 2);
             }
-            
-              var index = indexOfSmallest(record_dis); 
-              var in_arr = in_array(dupli_polygon,index);
-              //alert('in_arr:'+in_arr);
-              if (in_arr) 
-                {
-                  context.clearRect(0, 0, canvas.width, canvas.height);
-                  document.getElementById("inputTextToSave").value = "";
-                  record_index=[];
-                  count_index=0;
+
+            var index = indexOfSmallest(record_dis);
+            var in_arr = in_array(dupli_polygon, index);
+            //alert('in_arr:'+in_arr);
+            if (in_arr) {
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              document.getElementById("inputTextToSave").value = "";
+              record_index = [];
+              count_index = 0;
+            }
+
+            else {
+              text = [];
+              is_onlyOne = true;
+              editSaveState = true;
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              //alert('record_d[index]:'+record_index[index]);
+
+              record_index = record_index.slice(record_index.length - num, record_index.length);
+              origin_index = record_index[index];
+              drawUppercanvas(record_dots[index]);
+              document.getElementById("inputTextToSave").value = record_content[index];
+              //alert('hello');
+              for (var ii = 0; ii < len; ii++) {
+                if (ii != record_index[index]) {
+                  new_dots[count_newDots] = polygons[ii];
+                  new_content[count_newDots] = box_content[ii];
+                  count_newDots = count_newDots + 1;
                 }
 
-              else
-                {
-                  text=[];
-                  is_onlyOne=true;
-                  editSaveState=true;
-                  context.clearRect(0,0,canvas.width, canvas.height);
-                  //alert('record_d[index]:'+record_index[index]);
+              }
 
-                  record_index=record_index.slice(record_index.length-num,record_index.length);
-                  origin_index=record_index[index];
-                  drawUppercanvas(record_dots[index]);
-                  document.getElementById("inputTextToSave").value = record_content[index];
-                  //alert('hello');
-                  for(var ii=0; ii<len; ii++)
-                  {
-                    if(ii!=record_index[index])
-                    {
-                      new_dots[count_newDots]=polygons[ii];
-                      new_content[count_newDots]=box_content[ii];
-                      count_newDots=count_newDots+1;
-                    }   
-                     
-                  }
-                               
-                  for(var p=0;p<count_newDots;p++)
-                  {
-                    for (var tmp=0; tmp<new_dots[p].length; tmp++)
-                    {
-                      text +=Math.round(new_dots[p][tmp]/Id_size).toString()+' ';
-                    }
-                    text = text+new_content[p]+'\n';
-                  }
-                  record_index=[];
-                  record_index[0]=origin_index;
-                  count_index=1;
-
+              for (var p = 0; p < count_newDots; p++) {
+                for (var tmp = 0; tmp < new_dots[p].length; tmp++) {
+                  text += Math.round(new_dots[p][tmp] / Id_size).toString() + ' ';
                 }
+                text = text + new_content[p] + '\n';
+              }
+              record_index = [];
+              record_index[0] = origin_index;
+              count_index = 1;
 
-                    count_newDots=0;
-                    num=0;
-                    
+            }
+
+            count_newDots = 0;
+            num = 0;
+
           }
+        }
       }
-  }
-//}
+      //}
 
-    function getLineFunction(x1,y1,x2,y2)
-    {
-      var a,b,c;
-      if(x1==x2)
-      {
-         a=1;
-         b=0;
-         c=-x1;
+      function getLineFunction(x1, y1, x2, y2) {
+        var a, b, c;
+        if (x1 == x2) {
+          a = 1;
+          b = 0;
+          c = -x1;
+        }
+        else if (y1 == y2) {
+          a = 0;
+          b = 1;
+          c = -y1;
+        }
+        else {
+          a = y1 - y2;
+          b = -(x1 - x2);
+          c = x1 * y2 - x2 * y1;
+        }
+        //alert('x2,y2:',x2,y2);
+        return [a, b, c];
       }
-      else if(y1==y2)
-      {
-        a=0;
-        b=1;
-        c=-y1;
-      }
-      else
-      {
-        a=y1-y2;
-        b=-(x1-x2);
-        c=x1*y2-x2*y1;
-      }
-      //alert('x2,y2:',x2,y2);
-      return [a,b,c];
-    }
 
 
-    function indexOfSmallest(a) {
-       var lowest = 0;
-       for (var i = 1; i < a.length; i++) {
-        if (a[i] < a[lowest]) lowest = i;
-       }
-       return lowest;
-    }
+      function indexOfSmallest(a) {
+        var lowest = 0;
+        for (var i = 1; i < a.length; i++) {
+          if (a[i] < a[lowest]) lowest = i;
+        }
+        return lowest;
+      }
 
-  //find duplicated number
-   function is_dupilcate(arr) 
-   {
-       //    body...
+      //find duplicated number
+      function is_dupilcate(arr) {
+        //    body...
         var sorted_arr = arr.slice().sort();
         var results = [];
-        for (var i = 0; i < arr.length - 1; i++) 
-        {
-            if (sorted_arr[i + 1] == sorted_arr[i])
-                {
-                    results.push(sorted_arr[i]);
-              }
-      }
-      return results;
-  }
-
-   //whether the number is in the array or not 
-   function in_array(arr,index)
-   {
-      for (var i=0; i< arr.length; i++)
-      {
-        if (index==arr[i]) {return true;}
-      }
-   }
-
-  //function edit()
-
-   function drawPolygon(arry,color) {
-    // body...
-      context_bg.beginPath();
-      context_bg.strokeStyle = color||"#FF0000";
-      context_bg.moveTo(arry[0],arry[1]);//起始点 
-
-      for(var i=0,j=0;i<4;i++,j++)  
-     {
-
-       //alert(context_bg.strokeStyle);
-       context_bg.lineTo(arry[(i+j)%8],arry[(i+j+1)%8]);//起始点
-       //context_bg.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
-       //alert('hello');
-
-     }
-      context_bg.lineWidth = line_size; 
-      context_bg.closePath();
-      context_bg.stroke();  
-
-      context_bg.fillStyle="yellow";
-      context_bg.beginPath();
-      context_bg.arc(arry[0], arry[1],Math.min(dot_size * Id_size, dot_size),0,2*Math.PI,true);
-      context_bg.fill();
-  }
-
-
-  function drawUppercanvas(arry,color){
-    context.beginPath();
-    context.strokeStyle = color||"blue";
-    context.moveTo(arry[0],arry[1]);//起始点
-
-    for(var i=0,j=0;i<4;i++,j++)  
-   {
-
-     //alert(context_bg.strokeStyle);
-     context.lineTo(arry[(i+j)%8],arry[(i+j+1)%8]);//起始点
-     //context.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
-     //alert('hello');
-   }
-     context.lineWidth = line_size; 
-     context.closePath();
-     context.stroke();  
-
-  }
-
-
-  function readTxt(resize)
-  {
-     var resize_val=resize||1;
-     var fso, ts, s, m,l;
-     var ForReading = 1;
-     var n=0;
-     var mydot = new Array();
-     fso = new ActiveXObject("Scripting.FileSystemObject");
-     polygons=[];
-     box_content=[];
-     record_index=[];
-
-     //alert('readTxt:'+path);
-      //alert('first_polygon:'+polygons.length)
-     if(fso.FileExists(path))
-    {
-      
-      ts = fso.OpenTextFile(path, ForReading,false,-1);
-      while (!ts.AtEndOfStream){
-      s = ts.ReadLine();
-      l=s.split(' ');
-      m=l.slice(0,8);
-
-      var content=l.slice(8,l.length);
-      box_content[n]=content.join(' ');
-
-      for(var ii=0; ii<8; ii++)
-      {
-        mydot[ii]=parseInt(m[ii])*resize_val;     
-      }
-
-      editlabel = l[8]
-      drawPolygon(mydot, colordic[editlabel]);
-      polygons[n]=mydot;
-      n=n+1;
-
-      mydot=[];
-    }
-      if(ifCheck){
-        whenCheck();
-      }
-    //alert('polygons:'+polygons.length);
-  }
-
-  }
-
-  function delet()
-  {
-    if(editState)
-    {
-    is_onlyOne=false;
-    count_index = 0;
-    record_index=[];
-
-    writeTxt(text);
-    editState=false;
-    context_bg.clearRect(0, 0, canvas.width, canvas.height);
-    //alert(path);
-    readTxt(Id_size);     
-    }
-   document.getElementById("inputTextToSave").value = "";
-   context.clearRect(0, 0, canvas.width, canvas.height);
-   arry=[];
-   count=0;
-   n=0;
-   Sumcount=0;  
-  }
-
-
- function save()
- {
-    var s=[];
-    Id_size=Id_size||1;
-    var fso = new ActiveXObject("Scripting.FileSystemObject");
-  if(fso.FileExists(path))
-  {
-    var ts = fso.OpenTextFile(path, 1,false,-1);
-    while (!ts.AtEndOfStream)
-     {
-      s = ts.ReadAll();
-     }
-  }
-
-  if(!editState)
-  {
-    text=[];
-    is_onlyOne=false;
-    //alert("length:"+arry.length)
-    //alert(arry);
-     if((arry[0]!==undefined)&&(Sumcount%4==0)&&((Math.abs(arry[0]-arry[2])>3)||(Math.abs(arry[1]-arry[3])>3)))
-     {
-       //alert(Math.abs(arry[0]-arry[2]))
-       for (var i = 0; i <8; i++)
-     {
-      text +=Math.ceil(arry[i]/Id_size)+' ';
-     }
-    context_bg.drawImage(canvas, 0, 0);
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    var textToSave = document.getElementById("inputTextToSave").value;
-    text +=textToSave+'\n';
-    text=s+text;
-    //alert(text);
-    saveState=true;
-    textState=true;
-    arry=[];
-    Sumcount=0;
-    //Id_size=1;
-    writeTxt(text);
-   }
-    else{alert('error!');}
-    document.getElementById("inputTextToSave").value = "";
-   }
-   else if(editSaveState&&origin_index!=undefined)
-   {
-     is_onlyOne=false;
-     var rewrite_text=[];
-     box_content[origin_index]=document.getElementById("inputTextToSave").value;
-
-      for(var p=0;p<polygons.length;p++)
-      {
-        for (var tmp=0; tmp<polygons[p].length; tmp++)
-        {
-          rewrite_text +=Math.round(polygons[p][tmp]/Id_size).toString()+' ';
+        for (var i = 0; i < arr.length - 1; i++) {
+          if (sorted_arr[i + 1] == sorted_arr[i]) {
+            results.push(sorted_arr[i]);
+          }
         }
-
-        rewrite_text = rewrite_text+box_content[p]+'\n';
-
-      }
-      //alert('savetext:'+rewrite_text);
-      document.getElementById("inputTextToSave").value='';
-      writeTxt(rewrite_text);
-      editSaveState=false;
-      origin_index=undefined;
-   }
-
-  }
-
-   function saveTextAsFile()
-  {
-   textToSaveAsBlob = new Blob([text], {type:"text/plain"}); 
-   saveAs(textToSaveAsBlob , filenames[j]+'.txt');
-   textState=false;
-   text=[];
-   //saveAs(textToSaveAsBlob , "hello.txt");
-  }
-
-  function writeTxt(text)
-  {
-    var fso = new ActiveXObject("Scripting.FileSystemObject");
-    var index = filenames[j].lastIndexOf(".");
-    var writerPath =txtRoot+filenames[j].substring(0,index)+'.txt';
-    //var writerPath =txtRoot+filenames[j].substring(0,filenames[j].length-4)+'.txt';
-    //var writerPath =txtRoot+(filenames[j].split('.'))[0]+'.txt';
-    var f = fso.createtextfile(writerPath,2,true);
-    f.write(text);
-    text = [];
-    f.close();
-  }
-
-  function load_picture(){
-       //init
-    is_onlyOne=false;
-    Id_size=1;
-    arry=[];
-    count=0;
-    n=0;
-    Sumcount=0;
-
-    document.getElementById("resize_pic").value=Id_size;
-
-    contexto.clearRect(0, 0, canvaso.width, canvaso.height);
-    context_bg.clearRect(0,0,canvas_bg.width, canvas_bg.height);
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    var image = document.createElement("img");
-    image.src = "images/" + filenames[j];
-  
-    image.onload=function () 
-    {
-
-      if (image.width>window.screen.width)
-      {
-        Id_size=1000/image.width;
-        //Id_size=Id_size.toFixed(2);
-        image.height=image.height*Id_size;
-        image.width=image.width*Id_size;
-        document.getElementById("resize_pic").value=Id_size.toFixed(2);
+        return results;
       }
 
-      else if(image.width<300)
-      {
-        Id_size=500/image.width;
-        //Id_size=Id_size.toFixed(2);
-        image.height=image.height*Id_size;
-        image.width=image.width*Id_size;
-        document.getElementById("resize_pic").value=Id_size.toFixed(2);
-      }
-
-        canvaso.width=image.width;
-        canvaso.height=image.height;
-
-        canvas.width  = canvaso.width;
-        canvas.height = canvaso.height;
-
-        canvas_bg.width = canvaso.width;
-        canvas_bg.height= canvaso.height; 
-        contexto.drawImage(image,0,0,image.width,image.height);
-        var index = filenames[j].lastIndexOf("."); 
-        path=txtRoot+filenames[j].substring(0,index)+'.txt';
-        //alert('loadTxt:'+path)
-        readTxt(Id_size);
-        //alert(polygons.length);
-    }
-  }
-
-   function pic_resize()
-   {
-     var a=document.getElementById("resize_pic").value;  
-     if((a>0)&&(a<=10))
-     {
-       Id_size=a;
-       //alert(Id_size);
-       var image = document.createElement("img");
-       image.src = "images/" + filenames[j];
-       //alert('image');
-       image.onload=function () 
-      {
-         image.width=image.width*Id_size;
-         image.height=image.height*Id_size;
-         canvaso.width=image.width;
-         canvaso.height=image.height;
-
-         canvas_bg.width = canvaso.width;
-         canvas_bg.height= canvaso.height; 
-
-         canvas.width  = canvaso.width;
-         canvas.height = canvaso.height;
-         contexto.drawImage(image,0,0,image.width,canvaso.height);
-
-         readTxt(Id_size);
-      }
-     }
-     else
-     {alert('please input a number between 0 and 10!');}
-     document.getElementById("resize_pic").value='';   
-   }
-     
-
-   function later_picture(){
-
-    //alert('ifCheck2:'+ifCheck);
-    if((textState)&&(saveState))
-        {
-         saveState=false;
+      //whether the number is in the array or not 
+      function in_array(arr, index) {
+        for (var i = 0; i < arr.length; i++) {
+          if (index == arr[i]) { return true; }
         }
+      }
 
-      if(j<(filenames.length-1)){
+      //function edit()
 
-       j++;
-       //var is_pic=filenames[j].substring(filenames[j].length-3);
-        //alert('j:'+j)       
+      function drawPolygon(arry, color) {
+        // body...
+        context_bg.beginPath();
+        context_bg.strokeStyle = color || "#FF0000";
+        context_bg.moveTo(arry[0], arry[1]);//起始点 
 
-       load_picture();
-       document.getElementById("inputTextToSave").value = "";
-       document.getElementById("num_pic").value=j;
+        for (var i = 0, j = 0; i < 4; i++ , j++) {
 
+          //alert(context_bg.strokeStyle);
+          context_bg.lineTo(arry[(i + j) % 8], arry[(i + j + 1) % 8]);//起始点
+          //context_bg.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
+          //alert('hello');
+
+        }
+        context_bg.lineWidth = line_size;
+        context_bg.closePath();
+        context_bg.stroke();
+
+        context_bg.fillStyle = "yellow";
+        context_bg.beginPath();
+        context_bg.arc(arry[0], arry[1], Math.min(dot_size * Id_size, dot_size), 0, 2 * Math.PI, true);
+        context_bg.fill();
+      }
+
+
+      function drawUppercanvas(arry, color) {
+        context.beginPath();
+        context.strokeStyle = color || "blue";
+        context.moveTo(arry[0], arry[1]);//起始点
+
+        for (var i = 0, j = 0; i < 4; i++ , j++) {
+
+          //alert(context_bg.strokeStyle);
+          context.lineTo(arry[(i + j) % 8], arry[(i + j + 1) % 8]);//起始点
+          //context.lineTo(arry[(i+j+2)%8],arry[(i+j+3)%8]);//终点
+          //alert('hello');
+        }
+        context.lineWidth = line_size;
+        context.closePath();
+        context.stroke();
 
       }
-      else
-       {
-        alert('This is the last picture!');
-        if(ifCheck==true)
-        {
-           whenCheck();
-        }
-       }
-  }
 
-   function pre_picture(){
-      
-     //alert('ifCheck:'+ifCheck)
-     if((textState)&&(saveState))
-       {
-        saveState=false;
-       }
-          // text=[];
-      if(j==0)
-       {
-        alert('This is the first picture!');
-        if(ifCheck==true)
-        {
-          whenCheck();
+
+      function readTxt(resize) {
+        var resize_val = resize || 1;
+        var fso, ts, s, m, l;
+        var ForReading = 1;
+        var n = 0;
+        var mydot = new Array();
+        fso = new ActiveXObject("Scripting.FileSystemObject");
+        polygons = [];
+        box_content = [];
+        record_index = [];
+
+        //alert('readTxt:'+path);
+        //alert('first_polygon:'+polygons.length)
+        if (fso.FileExists(path)) {
+
+          ts = fso.OpenTextFile(path, ForReading, false, -1);
+          while (!ts.AtEndOfStream) {
+            s = ts.ReadLine();
+            l = s.split(' ');
+            m = l.slice(0, 8);
+
+            var content = l.slice(8, l.length);
+            box_content[n] = content.join(' ');
+
+            for (var ii = 0; ii < 8; ii++) {
+              mydot[ii] = parseInt(m[ii]) * resize_val;
+            }
+
+            editlabel = l[8]
+            drawPolygon(mydot, colordic[editlabel]);
+            polygons[n] = mydot;
+            n = n + 1;
+
+            mydot = [];
+          }
+          if (ifCheck) {
+            whenCheck();
+          }
+          //alert('polygons:'+polygons.length);
         }
-       }
-      else{
-        j--;
-        //alert('1:'+polygons.length);
-        load_picture();
-        //alert('2:'+polygons.length);
+        var idx = filenames[j].lastIndexOf(".");
+        var resolutionname = resolutionRoot + filenames[j].substring(0, idx) + '_res' + '.txt'
+        if (fso.FileExists(resolutionname)) {
+          ts = fso.OpenTextFile(resolutionname, ForReading, false, -1);
+          s = ts.ReadLine();
+          document.getElementById('resolution').value = s 
+        }
+      }
+
+      function delet() {
+        if (editState) {
+          is_onlyOne = false;
+          count_index = 0;
+          record_index = [];
+
+          writeTxt(text);
+          editState = false;
+          context_bg.clearRect(0, 0, canvas.width, canvas.height);
+          //alert(path);
+          readTxt(Id_size);
+        }
         document.getElementById("inputTextToSave").value = "";
-        document.getElementById("num_pic").value=j;
-        //context.clearRect(0,0,canvas.width,canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        arry = [];
+        count = 0;
+        n = 0;
+        Sumcount = 0;
+        flag_save = true;
       }
 
 
-  }
-  init();
+      function save() {
+        var s = [];
+        Id_size = Id_size || 1;
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        if (fso.FileExists(path)) {
+          var ts = fso.OpenTextFile(path, 1, false, -1);
+          while (!ts.AtEndOfStream) {
+            s = ts.ReadAll();
+          }
+        }
 
-}, false); }
+        if (!editState) {
+          text = [];
+          is_onlyOne = false;
+          //alert("length:"+arry.length)
+          //alert(arry);
+          if ((arry[0] !== undefined) && (Sumcount % 4 == 0) && ((Math.abs(arry[0] - arry[2]) > 3) || (Math.abs(arry[1] - arry[3]) > 3))) {
+            //alert(Math.abs(arry[0]-arry[2]))
+            for (var i = 0; i < 8; i++) {
+              text += Math.ceil(arry[i] / Id_size) + ' ';
+            }
+            context_bg.drawImage(canvas, 0, 0);
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            var textToSave = document.getElementById("inputTextToSave").value;
+            text += textToSave + '\n';
+            text = s + text;
+            //alert(text);
+            saveState = true;
+            textState = true;
+            arry = [];
+            Sumcount = 0;
+            //Id_size=1;
+            writeTxt(text);
+          }
+          else { alert('error!'); }
+          document.getElementById("LastLabel").value = document.getElementById("inputTextToSave").value;
+          document.getElementById("inputTextToSave").value = "";
+        }
+        else if (editSaveState && origin_index != undefined) {
+          is_onlyOne = false;
+          var rewrite_text = [];
+          box_content[origin_index] = document.getElementById("inputTextToSave").value;
+
+          for (var p = 0; p < polygons.length; p++) {
+            for (var tmp = 0; tmp < polygons[p].length; tmp++) {
+              rewrite_text += Math.round(polygons[p][tmp] / Id_size).toString() + ' ';
+            }
+
+            rewrite_text = rewrite_text + box_content[p] + '\n';
+
+          }
+          //alert('savetext:'+rewrite_text);
+          document.getElementById("LastLabel").value = document.getElementById("inputTextToSave").value;
+          document.getElementById("inputTextToSave").value = '';
+          writeTxt(rewrite_text);
+          editSaveState = false;
+          origin_index = undefined;
+        }
+
+        flag_save = true;
+      }
+
+      function saveTextAsFile() {
+        textToSaveAsBlob = new Blob([text], { type: "text/plain" });
+        saveAs(textToSaveAsBlob, filenames[j] + '.txt');
+        textState = false;
+        text = [];
+        //saveAs(textToSaveAsBlob , "hello.txt");
+      }
+
+      function writeTxt(text) {
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        var index = filenames[j].lastIndexOf(".");
+        var writerPath = txtRoot + filenames[j].substring(0, index) + '.txt';
+        //var writerPath =txtRoot+filenames[j].substring(0,filenames[j].length-4)+'.txt';
+        //var writerPath =txtRoot+(filenames[j].split('.'))[0]+'.txt';
+        //the createtextfile's three params' meaning?
+        var f = fso.createtextfile(writerPath, 2, true);
+        f.write(text);
+        text = [];
+        f.close();
+      }
+
+      function writeMark() {
+        var texttosave = document.getElementById("inputTextToSave")
+        var text = texttosave.value
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        var index = filenames[j].lastIndexOf(".");
+        var writerPath = markRoot + filenames[j].substring(0, index) + '_mark' + '.txt';
+        var f = fso.createtextfile(writerPath, 2, true);
+        f.write(text);
+        text = [];
+        f.close();
+        document.getElementById("inputTextToSave").value = ''
+      }
+
+      function load_picture() {
+        //init
+        is_onlyOne = false;
+        Id_size = 1;
+        arry = [];
+        count = 0;
+        n = 0;
+        Sumcount = 0;
+
+        document.getElementById("resize_pic").value = Id_size;
+
+        contexto.clearRect(0, 0, canvaso.width, canvaso.height);
+        context_bg.clearRect(0, 0, canvas_bg.width, canvas_bg.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        var image = document.createElement("img");
+        image.src = "images/" + filenames[j];
+
+        image.onload = function () {
+
+          if (image.width > window.screen.width) {
+            Id_size = 1000 / image.width;
+            //Id_size=Id_size.toFixed(2);
+            image.height = image.height * Id_size;
+            image.width = image.width * Id_size;
+            document.getElementById("resize_pic").value = Id_size.toFixed(2);
+          }
+
+          else if (image.width < 300) {
+            Id_size = 500 / image.width;
+            //Id_size=Id_size.toFixed(2);
+            image.height = image.height * Id_size;
+            image.width = image.width * Id_size;
+            document.getElementById("resize_pic").value = Id_size.toFixed(2);
+          }
+
+          canvaso.width = image.width;
+          canvaso.height = image.height;
+
+          canvas.width = canvaso.width;
+          canvas.height = canvaso.height;
+
+          canvas_bg.width = canvaso.width;
+          canvas_bg.height = canvaso.height;
+          contexto.drawImage(image, 0, 0, image.width, image.height);
+          var index = filenames[j].lastIndexOf(".");
+          path = txtRoot + filenames[j].substring(0, index) + '.txt';
+          //alert('loadTxt:'+path)
+          readTxt(Id_size);
+          //alert(polygons.length);
+        }
+      }
+
+      function pic_resize() {
+        var a = document.getElementById("resize_pic").value;
+        if ((a > 0) && (a <= 10)) {
+          Id_size = a;
+          //alert(Id_size);
+          var image = document.createElement("img");
+          image.src = "images/" + filenames[j];
+          //alert('image');
+          image.onload = function () {
+            image.width = image.width * Id_size;
+            image.height = image.height * Id_size;
+            canvaso.width = image.width;
+            canvaso.height = image.height;
+
+            canvas_bg.width = canvaso.width;
+            canvas_bg.height = canvaso.height;
+
+            canvas.width = canvaso.width;
+            canvas.height = canvaso.height;
+            contexto.drawImage(image, 0, 0, image.width, canvaso.height);
+
+            readTxt(Id_size);
+          }
+        }
+        else { alert('please input a number between 0 and 10!'); }
+        document.getElementById("resize_pic").value = '';
+      }
+
+
+      function later_picture() {
+
+        //alert('ifCheck2:'+ifCheck);
+        if ((textState) && (saveState)) {
+          saveState = false;
+        }
+
+        if (j < (filenames.length - 1)) {
+
+          j++;
+          //var is_pic=filenames[j].substring(filenames[j].length-3);
+          //alert('j:'+j)       
+
+          load_picture();
+          document.getElementById("inputTextToSave").value = "";
+          document.getElementById("num_pic").value = j;
+          document.getElementById("CurrentName").value = filenames[j]
+
+        }
+        else {
+          alert('This is the last picture!');
+          if (ifCheck == true) {
+            whenCheck();
+          }
+        }
+        flag_save = true;
+      }
+
+      function pre_picture() {
+
+        //alert('ifCheck:'+ifCheck)
+        if ((textState) && (saveState)) {
+          saveState = false;
+        }
+        // text=[];
+        if (j == 0) {
+          alert('This is the first picture!');
+          if (ifCheck == true) {
+            whenCheck();
+          }
+        }
+        else {
+          j--;
+          //alert('1:'+polygons.length);
+          load_picture();
+          //alert('2:'+polygons.length);
+          document.getElementById("inputTextToSave").value = "";
+          document.getElementById("num_pic").value = j;
+          document.getElementById("CurrentName").value = filenames[j]
+          //context.clearRect(0,0,canvas.width,canvas.height);
+        }
+
+        flag_save = true;
+      }
+
+  function countlineoffile(filename) {   
+    var numofline = 0;
+    var fso = new ActiveXObject("Scripting.FileSystemObject");   
+    if (fso.FileExists(filename)) {
+      var f = fso.OpenTextFile(filename,1);   
+      var s = "";   
+      while (!f.AtEndOfStream) {
+        var line = f.ReadLine();
+//        s += f.ReadLine()+"/n";   
+        s += line + "/n";
+        if (line.length > 1) {
+          numofline = numofline + 1;
+        }
+      }   
+      f.Close();   
+      return numofline;   
+    }
+    else {
+      return 0;
+    }
+  }
+      function countwhole() {
+        var i;
+        var numofinstance = 0;
+        for (i = 0; i < filenames.length; i++ ) {
+          var idx = filenames[i].lastIndexOf(".");
+          var currentname = txtRoot + filenames[i].substring(0,idx)+'.txt';
+          var singlecount = countlineoffile(currentname);
+          numofinstance = numofinstance + singlecount;
+        }
+        document.getElementById("totalannotated").value = numofinstance;
+      }
+      init();
+
+    }, false);
+  }
+
 </script>
+
 </html>
