@@ -67,10 +67,18 @@
       <h1>
         <a class="navbar-brand" target="_blank" style="color: #fff;">LabelTool</a></h1>
     </div>
-    <div id='DrawingTool' style="position:relative; left:400px;top:-60px">
+    <div id='DrawingTool' style="position:relative; left:200px;top:-60px">
+      current :
+      <input readonly="readonly" type="text" id="annotated" size="5" style="left:0px;top:0px"/>
+      total anno:
+      <input readonly="readonly" type="text" id="totalannotated" size="5" style="left:0px;top:0px"/>
+      <input type="button" id="countinstance" value="countinstance" onclic=""/>
       name:
       <input readonly="readonly" type="text" id="CurrentName" size="20" style="left:0px;top:0px" /> 
-      
+<!--       
+      resolution:
+      <input readonly="readonly" type="text" id="resolution" size="5" style="left:0px;top:0px" /> -->
+
       Total_Num:
       <input readonly="readonly" type="text" id="Total_Num" size="5" style="left:0px;top:0px" />
 
@@ -124,6 +132,7 @@
 
       var txtRoot = textRoot + 'labelTxt/';
       var markRoot = textRoot + 'mark/';
+      var resolutionRoot = textRoot + 'resolution/';
       var canvas, context, canvaso, contexto;
 
       //dot size
@@ -134,7 +143,7 @@
       line_size = 3;
       // the content need to check
       var dataDic = { '0A': 'passenger plane', '0B': 'fighter aeroplane', '0C': 'radar warning aircraft', '1': 'baseball diamond', '2': 'bridge', '3': 'ground track field', '4A': 'car', '4B': 'truck', '4C': 'bus', '5A': 'ship', '5B': 'warship', '6': 'tennis court', '7': 'Basketball court', '7B': 'half basketball', '8': 'storage tank', '9': 'soccer ball field', '10': 'Turntable', '11': 'harbor', '12': 'electric pole', '13': 'parking lot', '14': 'swimming pool', '15': 'lake', '16': 'helicopter', '17': 'airport', '18A': 'viaduct', '18B': '18B', '18C': '18C', '18D': '18D', '18E': '18E', '18F': '18F', '18G': '18G', '18H': '18H', '18I': '18I', '18J': '18J', '18K': '18K', '18L': '18L', '18M': '18M', '18N': '18N', '4A_area': '4A_area', '4B_area': '4B_area', '5A_area': '5A_area', '8_area': '8_area', '13_area': '13_area', 'bridge': 'bridge', 'plane': 'plane', 'ship': 'ship', 'storage': 'storage', 'harbor': 'harbor' };
-      var colordic = { '0A': '#FF00FF', '0B': '#FF00FF', '0C': '#FF00FF', '1': '#FAEBD7', '2': '#008000', '3': '#7FFFD4', '4A': '#000080', '4B': '#000080', '4C': '#000080', '5A': '#A52A2A', '5B': '#A52A2A', '6': '#8A2BE2', '7': '#DEB887', '7B': '#DEB887', '8': '#5F9EA0', '9': '#7FFF00', '10': '#D2691E', '11': '#FFFF00', '12': '#6495ED', '13': '#FF1493', '14': '#DC143C', '15': '#FFA07A', '16': '#00008B', '17': '#008B8B', '18A': '#B8860B', '18B': '#B8860B', '18C': '#B8860B', '18D': '#B8860B', '18E': '#B8860B', '18F': '#B8860B', '18G': '#B8860B', '18H': '#B8860B', '18I': '#B8860B', '18J': '#B8860B', '18K': '#B8860B', '18L': '#B8860B', '18M': '#B8860B', '18N': '#B8860B' }
+      var colordic = { '0A': '#FF00FF', '0B': '#FF00FF', '0C': '#FF00FF', '1': '#FAEBD7', '2': '#008000', '3': '#7FFFD4', '4A': '#000080', '4B': '#FFEFD5', '4C': '#FFA500', '5A': '#00FFFF', '5B': '#B0E0E6', '6': '#8A2BE2', '7': '#ADFF2F', '7B': '#ADFF2F', '8': '#5F9EA0', '9': '#7FFF00', '10': '#D2691E', '11': '#FFFF00', '12': '#6495ED', '13': '#FF1493', '14': '#DC143C', '15': '#FFA07A', '16': '#00008B', '17': '#008B8B', '18A': '#B8860B', '18B': '#B8860B', '18C': '#B8860B', '18D': '#B8860B', '18E': '#B8860B', '18F': '#B8860B', '18G': '#B8860B', '18H': '#B8860B', '18I': '#B8860B', '18J': '#B8860B', '18K': '#B8860B', '18L': '#B8860B', '18M': '#B8860B', '18N': '#B8860B' }
 
       // The active tool instance.
       var j = 0, textState = false, saveState = false, editState = false, editSaveState = false, is_onlyOne = false, ifCheck = false;
@@ -173,6 +182,7 @@
         var pre = document.getElementById("pre");
         var resize = document.getElementById('pic_resize');
         var mark = document.getElementById('mark')
+        var countinstances = document.getElementById("countinstance");
 
         var extensiondFirst = filenames[0].substring(filenames[0].length - 3);
         //alert(filenames[0]);
@@ -319,7 +329,7 @@
         pre.addEventListener("click", pre_picture);
         resize.addEventListener("click", pic_resize);
         mark.addEventListener("click", writeMark)
-      
+        countinstances.addEventListener("click", countwhole);
       }
 
       function endchange() {
@@ -580,6 +590,8 @@
         //context_bg.clearRect(0,0,canvas.width,canvas.height);
 
         var len = polygons.length;
+        var annotated_num  = document.getElementById('annotated')
+        annotated_num.value = len;
         //alert('len:'+lepolygonn)
         for (var k = 0; k < len; k++) {
           var label = box_content[k].split(' ');
@@ -983,6 +995,7 @@
             m = l.slice(0, 8);
 
             var content = l.slice(8, l.length);
+            //var content = l[9]
             box_content[n] = content.join(' ');
 
             for (var ii = 0; ii < 8; ii++) {
@@ -1001,7 +1014,13 @@
           }
           //alert('polygons:'+polygons.length);
         }
-
+        var idx = filenames[j].lastIndexOf(".");
+        var resolutionname = resolutionRoot + filenames[j].substring(0, idx) + '_res' + '.txt'
+        if (fso.FileExists(resolutionname)) {
+          ts = fso.OpenTextFile(resolutionname, ForReading, false, -1);
+          s = ts.ReadLine();
+          document.getElementById('resolution').value = s 
+        }
       }
 
       function delet() {
@@ -1050,6 +1069,14 @@
             context_bg.drawImage(canvas, 0, 0);
             context.clearRect(0, 0, canvas.width, canvas.height);
             var textToSave = document.getElementById("inputTextToSave").value;
+            if (textToSave == '') {
+              alert('please write the label');
+            }
+            label = textToSave.split(' ')[0]
+            if (!(label in dataDic)) {
+              alert('wrong label')
+            }
+            //alert(label)
             text += textToSave + '\n';
             text = s + text;
             //alert(text);
@@ -1256,6 +1283,39 @@
         }
 
         flag_save = true;
+      }
+
+  function countlineoffile(filename) {   
+    var numofline = 0;
+    var fso = new ActiveXObject("Scripting.FileSystemObject");   
+    if (fso.FileExists(filename)) {
+      var f = fso.OpenTextFile(filename,1);   
+      var s = "";   
+      while (!f.AtEndOfStream) {
+        var line = f.ReadLine();
+//        s += f.ReadLine()+"/n";   
+        s += line + "/n";
+        if (line.length > 1) {
+          numofline = numofline + 1;
+        }
+      }   
+      f.Close();   
+      return numofline;   
+    }
+    else {
+      return 0;
+    }
+  }
+      function countwhole() {
+        var i;
+        var numofinstance = 0;
+        for (i = 0; i < filenames.length; i++ ) {
+          var idx = filenames[i].lastIndexOf(".");
+          var currentname = txtRoot + filenames[i].substring(0,idx)+'.txt';
+          var singlecount = countlineoffile(currentname);
+          numofinstance = numofinstance + singlecount;
+        }
+        document.getElementById("totalannotated").value = numofinstance;
       }
       init();
 
