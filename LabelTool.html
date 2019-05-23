@@ -65,17 +65,16 @@
   <nav class="navbar navbar-default navbar-fixed-top" id="navbar" style="background: #96b97d;">
     <div class="navbar-header logo">
       <h1>
-        <a class="navbar-brand" target="_blank" style="color: #fff;">LabelTool</a></h1>
+        <a class="navbar-brand" target="_blank" style="color: #fff;">LabelTool</a>
+      </h1>
     </div>
     <div id='DrawingTool' style="position:relative; left:200px;top:-60px">
       current :
-      <input readonly="readonly" type="text" id="annotated" size="5" style="left:0px;top:0px"/>
-      total anno:
-      <input readonly="readonly" type="text" id="totalannotated" size="5" style="left:0px;top:0px"/>
-      <input type="button" id="countinstance" value="countinstance" onclic=""/>
-      name:
-      <input readonly="readonly" type="text" id="CurrentName" size="20" style="left:0px;top:0px" /> 
-<!--       
+      <input readonly="readonly" type="text" id="annotated" size="5" style="left:0px;top:0px" /> total anno:
+      <input readonly="readonly" type="text" id="totalannotated" size="5" style="left:0px;top:0px" />
+      <input type="button" id="countinstance" value="countinstance" onclic="" /> name:
+      <input readonly="readonly" type="text" id="CurrentName" size="20" style="left:0px;top:0px" />
+      <!--       
       resolution:
       <input readonly="readonly" type="text" id="resolution" size="5" style="left:0px;top:0px" /> -->
 
@@ -84,27 +83,26 @@
 
       <!--lastlabel-->
       LastLabel:
-      <input readonly="readonly" type="text" id="LastLabel" size="5" style="left:0px;top:0px" /> 
+      <input readonly="readonly" type="text" id="LastLabel" size="5" style="left:0px;top:0px" />
 
-      <input type="button" id="mark" size = "5" value="mark">
-      
-
-      Drawing tool:
+      <input type="button" id="mark" size="5" value="mark"> Drawing tool:
       <select id="dtool">
         <option value="rect">Rectangle</option>
         <option value="other">Dots</option>
         <option value="edit">Edit</option>
         <option value="check">Check</option>
-        </select>
+      </select>
       <input type="button" id="deletebutton" value="delete" onclic="" />
       <input type="button" id="savebutton" value="save" onclic="" />
       <input type="button" id="pre" value="pre" onlick="" />
       <input type="text" id="num_pic" size="10" />
-      <input type="button" id="after" value="after" onlick="" /><br>
+      <input type="button" id="after" value="after" onlick="" />
+      <br>
     </div>
 
     <div id='content' style="position:relative; left:600px;top:-60px">
-      <textarea id="inputTextToSave" cols="50" rows="2"></textarea><br>
+      <textarea id="inputTextToSave" cols="50" rows="2"></textarea>
+      <br>
 
     </div>
 
@@ -142,8 +140,34 @@
       //line_size = 2;
       line_size = 3;
       // the content need to check
-      var dataDic = { '0A': 'passenger plane', '0B': 'fighter aeroplane', '0C': 'radar warning aircraft', '1': 'baseball diamond', '2': 'bridge', '3': 'ground track field', '4A': 'car', '4B': 'truck', '4C': 'bus', '5A': 'ship', '5B': 'warship', '6': 'tennis court', '7': 'Basketball court', '7B': 'half basketball', '8': 'storage tank', '9': 'soccer ball field', '10': 'Turntable', '11': 'harbor', '12': 'electric pole', '13': 'parking lot', '14': 'swimming pool', '15': 'lake', '16': 'helicopter', '17': 'airport', '18A': 'viaduct', '18B': '18B', '18C': '18C', '18D': '18D', '18E': '18E', '18F': '18F', '18G': '18G', '18H': '18H', '18I': '18I', '18J': '18J', '18K': '18K', '18L': '18L', '18M': '18M', '18N': '18N', '4A_area': '4A_area', '4B_area': '4B_area', '5A_area': '5A_area', '8_area': '8_area', '13_area': '13_area', 'bridge': 'bridge', 'plane': 'plane', 'ship': 'ship', 'storage': 'storage', 'harbor': 'harbor' };
-      var colordic = { '0A': '#FF00FF', '0B': '#FF00FF', '0C': '#FF00FF', '1': '#FAEBD7', '2': '#008000', '3': '#7FFFD4', '4A': '#000080', '4B': '#FFEFD5', '4C': '#FFA500', '5A': '#00FFFF', '5B': '#B0E0E6', '6': '#8A2BE2', '7': '#ADFF2F', '7B': '#ADFF2F', '8': '#5F9EA0', '9': '#7FFF00', '10': '#D2691E', '11': '#FFFF00', '12': '#6495ED', '13': '#FF1493', '14': '#DC143C', '15': '#FFA07A', '16': '#00008B', '17': '#008B8B', '18A': '#B8860B', '18B': '#B8860B', '18C': '#B8860B', '18D': '#B8860B', '18E': '#B8860B', '18F': '#B8860B', '18G': '#B8860B', '18H': '#B8860B', '18I': '#B8860B', '18J': '#B8860B', '18K': '#B8860B', '18L': '#B8860B', '18M': '#B8860B', '18N': '#B8860B' }
+      var dataDic = {
+        '0A': 'passenger plane', '0B': 'fighter aeroplane', '0C': 'radar warning aircraft', '1': 'baseball diamond', '2': 'bridge',
+        '3': 'ground track field', '4A': 'car', '4B': 'truck', '4C': 'bus', '4E': 'tractor', '4F': 'excavator', '5A': 'small ship', '5B': 'large ship',
+        '6': 'tennis court', '7': 'basketball court', '7B': 'half basketball', '8': 'storage tank', '9': 'soccer ball field', '10': 'roundabout',
+        '11': 'harbor', '12': 'electric pole', '13': 'parking lot', '14': 'swimming pool', '15': 'lake', '16': 'helicopter', '17': 'airport',
+        '18A': 'viaduct', '18B': '18B', '18C': '18C', '18D': '18D', '18E': '18E', '18F': '18F', '18G': '18G', '18H': '18H', '18I': '18I',
+        '18J': '18J', '18K': '18K', '18L': '18L', '18M': '18M', '18N': '18N', '19': 'container crane', '20': 'wind turbine', '21':
+          'helipad', '22': 'bam', '23': 'light house', '4A_area': '4A_area', '4B_area': '4B_area', '5A_area': '5A_area', '8_area': '8_area',
+        '13_area': '13_area', 'bridge': 'bridge', 'plane': 'plane', 'ship': 'ship', 'storage': 'storage', 'harbor': 'harbor'
+      };
+      // var dataDic = { '0A': 'passenger plane', '0B': 'fighter aeroplane', '0C': 'radar warning aircraft', '1': 'baseball diamond', '2': 'bridge', '3': 'ground track field', '4A': 'car', '4B': 'truck', '4C': 'bus', '5A': 'ship', '5B': 'warship', '6': 'tennis court', '7': 'Basketball court', '7B': 'half basketball', '8': 'storage tank', '9': 'soccer ball field', '10': 'Turntable', '11': 'harbor', '12': 'electric pole', '13': 'parking lot', '14': 'swimming pool', '15': 'lake', '16': 'helicopter', '17': 'airport', '18A': 'viaduct', '18B': '18B', '18C': '18C', '18D': '18D', '18E': '18E', '18F': '18F', '18G': '18G', '18H': '18H', '18I': '18I', '18J': '18J', '18K': '18K', '18L': '18L', '18M': '18M', '18N': '18N', '4A_area': '4A_area', '4B_area': '4B_area', '5A_area': '5A_area', '8_area': '8_area', '13_area': '13_area', 'bridge': 'bridge', 'plane': 'plane', 'ship': 'ship', 'storage': 'storage', 'harbor': 'harbor' };
+      var colordic = {
+        '0A': '#FF00FF', '0B': '#FF00FF', '0C': '#FF00FF', '1': '#FAEBD7', '2': '#008000', '3': '#7FFFD4', '4A': '#000080',
+        '4B': '#FFEFD5', '4C': '#FFA500', '5A': '#943126', '5B': '#B0E0E6', '6': '#8A2BE2', '7': '#ADFF2F', '7B': '#ADFF2F', '8': '#5F9EA0',
+        '9': '#7FFF00', '10': '#D2691E', '11': '#FFFF00', '12': '#6495ED', '13': '#FF1493', '14': '#DC143C', '15': '#FFA07A', '16': '#00008B',
+        '17': '#008B8B', '18A': '#B8860B', '18B': '#B8860B', '18C': '#B8860B', '18D': '#B8860B', '18E': '#B8860B', '18F': '#B8860B',
+        '18G': '#B8860B', '18H': '#B8860B', '18I': '#B8860B', '18J': '#B8860B', '18K': '#B8860B', '18L': '#B8860B', '18M': '#B8860B', '18N': '#B8860B',
+        '19': '#B8860B', '20': '#52BE80', '21': '#52BE80'
+      }
+
+      var wordnames = ['plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court',
+        'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout', 'harbor', 'swimming-pool', 'helicopter',
+        'container-crane', 'helipad', 'wind-turbine', 'airport']
+
+      var name2id = {        
+        'plane': '0A', 'baseball-diamond': '1', 'bridge': '2', 'ground-track-field': '3', 'small-vehicle': '4A', 'large-vehicle': '4C', 'ship': '5A', 
+        'tennis-court': '6', 'basketball-court': '7', 'storage-tank': '8', 'soccer-ball-field': '9', 'roundabout': '10', 'harbor': '11', 'swimming-pool': '15', 
+        'helicopter': '16', 'container-crane': '19', 'helipad': '21', 'wind-turbine': '20', 'airport': '17'}
 
       // The active tool instance.
       var j = 0, textState = false, saveState = false, editState = false, editSaveState = false, is_onlyOne = false, ifCheck = false;
@@ -172,10 +196,9 @@
       var textToSaveAsBlob = new Blob();
       var filenames = g_FOLDER_CONTENTS.match(/\S+/g);
       document.getElementById("Total_Num").value = filenames.length;
-      
 
-      function init() 
-      {
+
+      function init() {
         var deletebutton = document.getElementById("deletebutton");
         var savebutton = document.getElementById("savebutton");
         var after = document.getElementById("after");
@@ -590,7 +613,7 @@
         //context_bg.clearRect(0,0,canvas.width,canvas.height);
 
         var len = polygons.length;
-        var annotated_num  = document.getElementById('annotated')
+        var annotated_num = document.getElementById('annotated')
         annotated_num.value = len;
         //alert('len:'+lepolygonn)
         for (var k = 0; k < len; k++) {
@@ -598,7 +621,11 @@
           //alert('label'+label)
           label = label[0];
           //drawUppercanvas(polygons[k],'#F0F8FF');
-          drawUppercanvas(polygons[k], colordic[label])
+          if (label in name2id) {
+            drawUppercanvas(polygons[k], colordic[name2id[label]])
+          } else {
+            drawUppercanvas(polygons[k], colordic[label])
+          }
           //alert('after draw' );
           context.fillStyle = "yellow";
           context.beginPath();
@@ -609,7 +636,12 @@
           context.font = "20px serif";
           context.fillStyle = 'red';
           //alert(dataDic[label]);
-          context.fillText(dataDic[label], polygons[k][0] - 5, polygons[k][1] - 5);
+          if (label in name2id) {
+            context.fillText(label, polygons[k][0] - 5, polygons[k][1] - 5);
+          }
+          else {
+            context.fillText(dataDic[label], polygons[k][0] - 5, polygons[k][1] - 5);
+          }
         }
       }
 
@@ -1002,7 +1034,11 @@
             }
 
             editlabel = l[8]
-            drawPolygon(mydot, colordic[editlabel]);
+            if (editlabel in name2id) {
+              drawPolygon(mydot, colordic[name2id[editlabel]]);
+            } else {
+              drawPolygon(mydot, colordic[editlabel]);
+            }
             polygons[n] = mydot;
             n = n + 1;
 
@@ -1018,7 +1054,7 @@
         if (fso.FileExists(resolutionname)) {
           ts = fso.OpenTextFile(resolutionname, ForReading, false, -1);
           s = ts.ReadLine();
-          document.getElementById('resolution').value = s 
+          document.getElementById('resolution').value = s
         }
       }
 
@@ -1276,33 +1312,33 @@
         flag_save = true;
       }
 
-  function countlineoffile(filename) {   
-    var numofline = 0;
-    var fso = new ActiveXObject("Scripting.FileSystemObject");   
-    if (fso.FileExists(filename)) {
-      var f = fso.OpenTextFile(filename,1);   
-      var s = "";   
-      while (!f.AtEndOfStream) {
-        var line = f.ReadLine();
-//        s += f.ReadLine()+"/n";   
-        s += line + "/n";
-        if (line.length > 1) {
-          numofline = numofline + 1;
+      function countlineoffile(filename) {
+        var numofline = 0;
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        if (fso.FileExists(filename)) {
+          var f = fso.OpenTextFile(filename, 1);
+          var s = "";
+          while (!f.AtEndOfStream) {
+            var line = f.ReadLine();
+            //        s += f.ReadLine()+"/n";   
+            s += line + "/n";
+            if (line.length > 1) {
+              numofline = numofline + 1;
+            }
+          }
+          f.Close();
+          return numofline;
         }
-      }   
-      f.Close();   
-      return numofline;   
-    }
-    else {
-      return 0;
-    }
-  }
+        else {
+          return 0;
+        }
+      }
       function countwhole() {
         var i;
         var numofinstance = 0;
-        for (i = 0; i < filenames.length; i++ ) {
+        for (i = 0; i < filenames.length; i++) {
           var idx = filenames[i].lastIndexOf(".");
-          var currentname = txtRoot + filenames[i].substring(0,idx)+'.txt';
+          var currentname = txtRoot + filenames[i].substring(0, idx) + '.txt';
           var singlecount = countlineoffile(currentname);
           numofinstance = numofinstance + singlecount;
         }
